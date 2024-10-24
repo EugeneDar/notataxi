@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package orderinfo;
+
+service OrderService {
+  rpc GetOrderInfo (GetOrderInfoRequest) returns (GetOrderInfoResponse);
+}
+
+message GetOrderInfoRequest {
+  int32 order_id = 1;
+}
+
+message GetOrderInfoResponse {
+  float price = 1;
+  PriceComponents price_components = 2;
+  ExecutorInfo executor_info = 3;
+}
+
+message ExecutorInfo {
+  string name = 1;
+  float rating = 2;
+}
+
+message PriceComponents {
+  float base_price = 1;
+  float zone_coefficient = 2;
+  float toll_roads_price = 3;
+}
