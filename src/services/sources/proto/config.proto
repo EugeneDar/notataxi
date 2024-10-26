@@ -8,7 +8,7 @@ service ConfigService {
     rpc GetConfig (google.protobuf.Empty) returns (ConfigResponse);
 }
 
-message ConfigResponse {
+message ConfigResponse { // TODO(Dmitry909) какие здесь должны быть параметры?
     CoinCoeffSettings coin_coeff_settings = 1;
 }
 
