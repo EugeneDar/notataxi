@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package toll_roads;
+
+service TollRoadsService {
+    rpc GetTollRoads (TollRoadsRequest) returns (TollRoadsResponse);
+}
+
+message TollRoadsRequest {
+    string display_name = 1;
+}
+
+message TollRoadsResponse {
+    float bonus_amount = 1;
+}

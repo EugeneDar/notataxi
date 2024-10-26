@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package order_data;
+
+service OrderDataService {
+    rpc GetOrderData (OrderDataRequest) returns (OrderDataResponse);
+}
+
+message OrderDataRequest {
+    string order_id = 1;
+}
+
+message OrderDataResponse {
+    string order_id = 1;
+    string user_id = 2;
+    string zone_id = 3;
+    float base_coin_amount = 4;
+}
