@@ -3,7 +3,7 @@ syntax = "proto3";
 package zone_data;
 
 service ZoneDataService {
-    rpc ZoneData (ZoneDataRequest) returns (ZoneDataResponse);
+    rpc GetZoneData (ZoneDataRequest) returns (ZoneDataResponse);
 }
 
 message ZoneDataRequest {

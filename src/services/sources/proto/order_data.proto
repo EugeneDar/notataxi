@@ -3,7 +3,7 @@ syntax = "proto3";
 package order_data;
 
 service OrderDataService {
-    rpc OrderData (OrderDataRequest) returns (OrderDataResponse);
+    rpc GetOrderData (OrderDataRequest) returns (OrderDataResponse);
 }
 
 message OrderDataRequest {

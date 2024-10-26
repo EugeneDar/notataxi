@@ -3,26 +3,28 @@ syntax = "proto3";
 package sources;
 
 service OrderInfoService {
-    rpc GetOrderInfo (GetOrderInfoRequest) returns (GetOrderInfoResponse);
+    rpc GetOrderInfo (OrderInfoRequest) returns (OrderInfoResponse);
 }
 
-message GetOrderInfoRequest {
+message OrderInfoRequest {
     string order_id = 1;
 }
 
-message GetOrderInfoResponse {
-    float price = 1;
-    PriceComponents price_components = 2;
-    ExecutorInfo executor_info = 3;
+message OrderInfoResponse {
+    string order_id = 1;
+    float final_coin_amount = 2;
+    PriceComponents price_components = 3;
+    ExecutorProfile executor_profile = 4;
 }
 
-message ExecutorInfo {
-    string name = 1;
-    float rating = 2;
+message ExecutorProfile {
+    string id = 1;
+    repeated string tags = 2;
+    float rating = 3;
 }
 
 message PriceComponents {
-    float base_price = 1;
-    float zone_coefficient = 2;
-    float toll_roads_price = 3;
+    float base_coin_amount = 1;
+    float coin_coeff = 2;
+    float bonus_amount = 3;
 }

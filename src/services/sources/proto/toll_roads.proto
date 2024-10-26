@@ -3,7 +3,7 @@ syntax = "proto3";
 package toll_roads;
 
 service TollRoadsService {
-    rpc TollRoads (TollRoadsRequest) returns (TollRoadsResponse);
+    rpc GetTollRoads (TollRoadsRequest) returns (TollRoadsResponse);
 }
 
 message TollRoadsRequest {
