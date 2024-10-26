@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package zone_data;
+
+service ZoneDataService {
+    rpc ZoneData (ZoneDataRequest) returns (ZoneDataResponse);
+}
+
+message ZoneDataRequest {
+    string zone_id = 1;
+}
+
+message ZoneDataResponse {
+    string zone_id = 1;
+    float coin_coeff = 2;
+    string display_name = 3;
+}

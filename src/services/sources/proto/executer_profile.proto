@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package executor_profile;
+
+service ExecutorProfileService {
+    rpc ExecutorProfile (ExecutorProfileRequest) returns (ExecutorProfileResponse);
+}
+
+message ExecutorProfileRequest {
+    string display_name = 1;
+}
+
+message ExecutorProfileResponse {
+    float bonus_amount = 1;
+}
