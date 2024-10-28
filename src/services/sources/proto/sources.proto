@@ -8,6 +8,7 @@ service OrderInfoService {
 
 message OrderInfoRequest {
     string order_id = 1;
+    string executor_id = 2;
 }
 
 message OrderInfoResponse {
