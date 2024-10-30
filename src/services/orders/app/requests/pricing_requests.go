@@ -1,4 +1,4 @@
-package main
+package requests
 
 // todo(eugenedar): use generated protobuf structs instead of hand-written ones
 type OrderInfoResponse struct {

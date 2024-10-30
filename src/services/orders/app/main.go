@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
+    "app/database"
+    "app/requests"
+    "app/model"
+    "app/utils"
 )
 
 var MinRatingToShowDestination = 4.5
 
-var orderDatabase = NewDatabase()
-var orderExecuterIndex = NewDatabase()
+var orderDatabase = database.NewDatabase()
+var orderExecuterIndex = database.NewDatabase()
 
 func handleAssignOrderRequest(w http.ResponseWriter, r *http.Request) {
     orderId := r.URL.Query().Get("order_id")
@@ -23,10 +26,10 @@ func handleAssignOrderRequest(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    orderInfo := GetOrderInfo(orderId, executerId)
+    orderInfo := requests.GetOrderInfo(orderId, executerId)
 
-    order := AssignedOrder{
-        AssignOrderId:    GenerateUUID(),
+    order := model.AssignedOrder{
+        AssignOrderId:    utils.GenerateUUID(),
         OrderId:          orderId,
         ExecuterId:       executerId,
         CoinCoeff:        orderInfo.PriceComponents.CoinCoeff,
