@@ -52,8 +52,57 @@ func handleAssignOrderRequest(w http.ResponseWriter, r *http.Request) {
     orderExecuterIndex.AddItem(executerId, orderId)
 }
 
+func handleAcquireOrderRequest(w http.ResponseWriter, r *http.Request) {
+    executerId := r.URL.Query().Get("executer_id")
+
+    if executerId == "" {
+        http.Error(w, "Missing parameters, please provide executer_id", http.StatusBadRequest)
+        return
+    }
+
+    orderId, err := orderExecuterIndex.GetItem(executerId)
+    if err != nil {
+        fmt.Printf("Order for executer ID \"%s\" not found!\n", executerId)
+        return
+    }
+
+    orderData, err := orderDatabase.GetItem(orderId.(string))
+    if err != nil {
+        fmt.Printf("Order data for order ID \"%s\" not found!\n", orderId)
+        return
+    }
+
+    order := orderData.(model.AssignedOrder)
+    order.AcquireTime = time.Now()
+
+    fmt.Printf(">> Order acquired! Acquire time == %v\n", order.AcquireTime.Sub(order.AssignTime))
+    fmt.Printf(">> Order data: %+v\n", order)
+}
+
+func handleCancelOrderRequest(w http.ResponseWriter, r *http.Request) {
+    orderId := r.URL.Query().Get("order_id")
+
+    if orderId == "" {
+        http.Error(w, "Missing parameters, please provide order_id", http.StatusBadRequest)
+        return
+    }
+
+    orderData, err := orderDatabase.DeleteItem(orderId)
+    if err != nil {
+        fmt.Printf("Order data for order ID \"%s\" not found!\n", orderId)
+        return
+    }
+
+    order := orderData.(model.AssignedOrder)
+    orderExecuterIndex.DeleteItem(order.ExecuterId)
+
+    fmt.Printf(">> Order was cancelled! %+v\n", order)
+}
+
 func main() {
     http.HandleFunc("/order/assign", handleAssignOrderRequest)
+    http.HandleFunc("/order/acquire", handleAcquireOrderRequest)
+    http.HandleFunc("/order/cancel", handleCancelOrderRequest);
 
     fmt.Println("Starting server at :8080")
     if err := http.ListenAndServe(":8080", nil); err != nil {

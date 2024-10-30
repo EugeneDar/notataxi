@@ -33,12 +33,13 @@ func (db *Database) GetItem(key string) (interface{}, error) {
 	return value, nil
 }
 
-func (db *Database) DeleteItem(key string) error {
+func (db *Database) DeleteItem(key string) (interface{}, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	if _, exists := db.data[key]; !exists {
-		return errors.New("item not found")
+	value, exists := db.data[key]
+	if !exists {
+		return nil, errors.New("item not found")
 	}
 	delete(db.data, key)
-	return nil
+	return value, nil
 }
