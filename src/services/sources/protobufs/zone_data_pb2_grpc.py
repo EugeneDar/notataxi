@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import zone_data_pb2 as zone__data__pb2
+import src.services.sources.protobufs.zone_data_pb2 as zone__data__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__

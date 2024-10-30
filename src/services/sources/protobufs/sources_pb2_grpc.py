@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import sources_pb2 as sources__pb2
+import src.services.sources.protobufs.sources_pb2 as sources__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__

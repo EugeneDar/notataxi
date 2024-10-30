@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import executor_profile_pb2 as executor__profile__pb2
+import src.services.sources.protobufs.executor_profile_pb2 as executor__profile__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__
