@@ -16,6 +16,7 @@ message OrderInfoResponse {
     float final_coin_amount = 2;
     PriceComponents price_components = 3;
     ExecutorProfile executor_profile = 4;
+    string zone_display_name = 5;
 }
 
 message ExecutorProfile {
