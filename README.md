@@ -1,5 +1,5 @@
 # notataxi
 
-[Architecture design record](ADR.md)
+[Architecture design record](docs/ADR.md)
 
-[Отчёт](report.md)
+[Отчёт](docs/report.md)
