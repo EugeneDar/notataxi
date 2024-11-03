@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import src.services.sources.protobufs.toll_roads_pb2 as toll__roads__pb2
+import toll_roads_pb2 as toll__roads__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__

@@ -1,20 +1,22 @@
+import sys
+import os
 import grpc
 import time
 import pytest
 import concurrent.futures
 from google.protobuf import empty_pb2
-
-from src.services.sources.protobufs.config_pb2_grpc import ConfigServiceStub
-from src.services.sources.protobufs.executor_profile_pb2_grpc import ExecutorProfileServiceStub
-from src.services.sources.protobufs.executor_profile_pb2 import ExecutorProfileRequest
-from src.services.sources.protobufs.order_data_pb2_grpc import OrderDataServiceStub
-from src.services.sources.protobufs.order_data_pb2 import OrderDataRequest
-from src.services.sources.protobufs.sources_pb2_grpc import OrderInfoServiceStub
-from src.services.sources.protobufs.sources_pb2 import OrderInfoRequest
-from src.services.sources.protobufs.toll_roads_pb2_grpc import TollRoadsServiceStub
-from src.services.sources.protobufs.toll_roads_pb2 import TollRoadsRequest
-from src.services.sources.protobufs.zone_data_pb2_grpc import ZoneDataServiceStub
-from src.services.sources.protobufs.zone_data_pb2 import ZoneDataRequest
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../protobufs'))
+from config_pb2_grpc import ConfigServiceStub
+from executor_profile_pb2_grpc import ExecutorProfileServiceStub
+from executor_profile_pb2 import ExecutorProfileRequest
+from order_data_pb2_grpc import OrderDataServiceStub
+from order_data_pb2 import OrderDataRequest
+from sources_pb2_grpc import OrderInfoServiceStub
+from sources_pb2 import OrderInfoRequest
+from toll_roads_pb2_grpc import TollRoadsServiceStub
+from toll_roads_pb2 import TollRoadsRequest
+from zone_data_pb2_grpc import ZoneDataServiceStub
+from zone_data_pb2 import ZoneDataRequest
 
 @pytest.fixture(scope="module")
 def grpc_channel():
