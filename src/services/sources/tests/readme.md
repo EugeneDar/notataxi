@@ -1,3 +1,5 @@
-run tests from the root directory:
+run tests from any directory:
 
-python -m pytest absolute/path/to/test.py  
+```
+python -m pytest test.py
+```
