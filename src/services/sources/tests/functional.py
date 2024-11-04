@@ -100,16 +100,16 @@ def zone_data_service(grpc_channel):
 #         order_info_service.GetOrderInfo(request)
 #     assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return NOT_FOUND for invalid executor_id"
 
-# def test_get_toll_roads_valid_request(toll_roads_service):
-#     request = TollRoadsRequest(display_name="Highway 101")
-#     response = toll_roads_service.GetTollRoads(request)
-#     assert response.bonus_amount >= 0, "Bonus amount should not be negative"
+def test_get_toll_roads_valid_request(toll_roads_service):
+    request = TollRoadsRequest(display_name="Highway 101")
+    response = toll_roads_service.GetTollRoads(request)
+    assert response.bonus_amount >= 0, "Bonus amount should not be negative"
 
-# def test_get_toll_roads_invalid_request(toll_roads_service):
-#     request = TollRoadsRequest(display_name="")
-#     with pytest.raises(grpc.RpcError) as exc_info:
-#         toll_roads_service.GetTollRoads(request)
-#     assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty display_name"
+def test_get_toll_roads_invalid_request(toll_roads_service):
+    request = TollRoadsRequest(display_name="")
+    with pytest.raises(grpc.RpcError) as exc_info:
+        toll_roads_service.GetTollRoads(request)
+    assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty display_name"
 
 def test_get_zone_data_valid_zone(zone_data_service):
     request = ZoneDataRequest(zone_id="zone_abc")
