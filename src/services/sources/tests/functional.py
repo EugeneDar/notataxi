@@ -118,8 +118,8 @@ def test_get_zone_data_valid_zone(zone_data_service):
     assert 0 <= response.coin_coeff <= 10, "Coin coeff out of expected range"
     assert len(response.display_name) > 0, "Display name should not be empty"
 
-def test_get_zone_data_nonexistent_zone(zone_data_service):
-    request = ZoneDataRequest(zone_id="nonexistent_zone")
+def test_get_zone_data_invalid_zone(zone_data_service):
+    request = ZoneDataRequest(zone_id="")
     with pytest.raises(grpc.RpcError) as exc_info:
         zone_data_service.GetZoneData(request)
-    assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return NOT_FOUND for nonexistent zone"
+    assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty zone_id"
