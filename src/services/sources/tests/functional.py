@@ -49,10 +49,10 @@ def zone_data_service(grpc_channel):
 def test_get_config(config_service):
     response = config_service.GetConfig(empty_pb2.Empty())
     # assert isinstance(response, ConfigResponse)
-    assert isinstance(response.coin_coeff_settings.maximum, float)
-    assert isinstance(response.coin_coeff_settings.fallback, float)
-    assert 0 <= response.coin_coeff_settings.maximum <= 10, "Maximum coeff out of range"
-    assert 0 <= response.coin_coeff_settings.fallback <= 10, "Fallback coeff out of range"
+    assert isinstance(response.settings["coin_coeff_settings_maximum"], str)
+    assert isinstance(response.settings["coin_coeff_settings_fallback"], str)
+    assert 0 <= float(response.settings["coin_coeff_settings_maximum"]) <= 10, "Maximum coeff out of range"
+    assert 0 <= float(response.settings["coin_coeff_settings_fallback"]) <= 10, "Fallback coeff out of range"
 
 def test_get_executor_profile_valid_request(executor_profile_service):
     request = ExecutorProfileRequest(display_name="Valid User")
