@@ -78,11 +78,11 @@ def test_get_order_data_valid_order(order_data_service):
     assert len(response.zone_id) > 0, "Zone ID should not be empty"
     assert response.base_coin_amount > 0, "Base coin amount should be positive"
 
-def test_get_order_data_invalid_order(order_data_service):
-    request = OrderDataRequest(order_id="invalid_order")
+def test_get_order_data_error_order(order_data_service):
+    request = OrderDataRequest(order_id="")
     with pytest.raises(grpc.RpcError) as exc_info:
         order_data_service.GetOrderData(request)
-    assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return NOT_FOUND for invalid order"
+    assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty order"
 
 def test_get_order_info_valid_order(order_info_service):
     request = OrderInfoRequest(order_id="order_123", executor_id="exec_456")
