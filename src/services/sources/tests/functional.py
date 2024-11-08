@@ -49,26 +49,26 @@ def zone_data_service(grpc_channel):
 def test_get_config(config_service):
     response = config_service.GetConfig(empty_pb2.Empty())
     # assert isinstance(response, ConfigResponse)
-    assert isinstance(response.coin_coeff_settings.maximum, float)
-    assert isinstance(response.coin_coeff_settings.fallback, float)
-    assert 0 <= response.coin_coeff_settings.maximum <= 10, "Maximum coeff out of range"
-    assert 0 <= response.coin_coeff_settings.fallback <= 10, "Fallback coeff out of range"
+    assert isinstance(response.settings["coin_coeff_settings_maximum"], str)
+    assert isinstance(response.settings["coin_coeff_settings_fallback"], str)
+    assert 0 <= float(response.settings["coin_coeff_settings_maximum"]) <= 10, "Maximum coeff out of range"
+    assert 0 <= float(response.settings["coin_coeff_settings_fallback"]) <= 10, "Fallback coeff out of range"
 
 def test_get_executor_profile_valid_request(executor_profile_service):
     request = ExecutorProfileRequest(display_name="Valid User")
     response = executor_profile_service.GetExecutorProfile(request)
     assert response.id
     assert len(response.id) > 0, "ID should not be empty"
-    assert isinstance(response.tags, list)
+    tags = list(response.tags)
+    assert len(tags) > 0 and all([lambda x: isinstance(x, str) for x in tags])
     assert all(isinstance(tag, str) for tag in response.tags), "All tags should be strings"
     assert 0 <= response.rating <= 5, "Rating out of range"
 
 def test_get_executor_profile_empty_name(executor_profile_service):
     request = ExecutorProfileRequest(display_name="")
-    response = executor_profile_service.GetExecutorProfile(request)
-    assert response.id == "", "ID should be empty for unknown display_name"
-    assert response.rating == 0.0, "Rating should be zero for unknown display_name"
-    assert not response.tags, "Tags should be empty for unknown display_name"
+    with pytest.raises(grpc.RpcError) as exc_info:
+        executor_profile_service.GetExecutorProfile(request)
+    assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty order"
 
 def test_get_order_data_valid_order(order_data_service):
     request = OrderDataRequest(order_id="order_123")
@@ -78,11 +78,11 @@ def test_get_order_data_valid_order(order_data_service):
     assert len(response.zone_id) > 0, "Zone ID should not be empty"
     assert response.base_coin_amount > 0, "Base coin amount should be positive"
 
-def test_get_order_data_invalid_order(order_data_service):
-    request = OrderDataRequest(order_id="invalid_order")
+def test_get_order_data_error_order(order_data_service):
+    request = OrderDataRequest(order_id="")
     with pytest.raises(grpc.RpcError) as exc_info:
         order_data_service.GetOrderData(request)
-    assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return NOT_FOUND for invalid order"
+    assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty order"
 
 def test_get_order_info_valid_order(order_info_service):
     request = OrderInfoRequest(order_id="order_123", executor_id="exec_456")

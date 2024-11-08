@@ -5,7 +5,7 @@ import random
 import os
 import sys
 from grpc_reflection.v1alpha import reflection
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../sources/protobufs'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sources/protobufs'))
 import zone_data_pb2
 import zone_data_pb2_grpc
 
@@ -34,15 +34,16 @@ def serve():
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    server.add_insecure_port('[::]:50051')
+    port = 50051
+    server.add_insecure_port(f'[::]:{port}')
     server.start()
-    print("Server started, listening on port 50051.")
+    print(f"Server started, listening on port {port}.")
     
     try:
         while True:
             time.sleep(86400)
     except KeyboardInterrupt:
         server.stop(0)
-        
+
 if __name__ == '__main__':
     serve()

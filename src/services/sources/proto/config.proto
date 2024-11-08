@@ -8,11 +8,6 @@ service ConfigService {
     rpc GetConfig (google.protobuf.Empty) returns (ConfigResponse);
 }
 
-message ConfigResponse { // TODO(Dmitry909) какие здесь должны быть параметры?
-    CoinCoeffSettings coin_coeff_settings = 1;
-}
-
-message CoinCoeffSettings {
-    float maximum = 1;
-    float fallback = 2;
+message ConfigResponse {
+    map<string, string> settings = 1;
 }
