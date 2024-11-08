@@ -17,6 +17,7 @@ message OrderInfoResponse {
     PriceComponents price_components = 3;
     ExecutorProfile executor_profile = 4;
     string zone_display_name = 5;
+    bool used_executor_fallback = 6;
 }
 
 message ExecutorProfile {
