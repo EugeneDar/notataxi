@@ -34,9 +34,10 @@ def serve():
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    server.add_insecure_port('[::]:50051')
+    port = 50051
+    server.add_insecure_port(f'[::]:{port}')
     server.start()
-    print("Server started, listening on port 50051.")
+    print(f"Server started, listening on port {port}.")
     
     try:
         while True:
