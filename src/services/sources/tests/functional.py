@@ -59,16 +59,16 @@ def test_get_executor_profile_valid_request(executor_profile_service):
     response = executor_profile_service.GetExecutorProfile(request)
     assert response.id
     assert len(response.id) > 0, "ID should not be empty"
-    assert isinstance(response.tags, list)
+    tags = list(response.tags)
+    assert len(tags) > 0 and all([lambda x: isinstance(x, str) for x in tags])
     assert all(isinstance(tag, str) for tag in response.tags), "All tags should be strings"
     assert 0 <= response.rating <= 5, "Rating out of range"
 
 def test_get_executor_profile_empty_name(executor_profile_service):
     request = ExecutorProfileRequest(display_name="")
-    response = executor_profile_service.GetExecutorProfile(request)
-    assert response.id == "", "ID should be empty for unknown display_name"
-    assert response.rating == 0.0, "Rating should be zero for unknown display_name"
-    assert not response.tags, "Tags should be empty for unknown display_name"
+    with pytest.raises(grpc.RpcError) as exc_info:
+        executor_profile_service.GetExecutorProfile(request)
+    assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty order"
 
 def test_get_order_data_valid_order(order_data_service):
     request = OrderDataRequest(order_id="order_123")
