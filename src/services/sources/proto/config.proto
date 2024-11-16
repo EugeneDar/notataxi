@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package config;
 
+option go_package = "./config";
+
 import "google/protobuf/empty.proto";
 
 service ConfigService {

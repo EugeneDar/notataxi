@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package sources;
 
+option go_package = "./sources";
+
 service OrderInfoService {
     rpc GetOrderInfo (OrderInfoRequest) returns (OrderInfoResponse);
 }
