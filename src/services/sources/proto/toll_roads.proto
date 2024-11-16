@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package toll_roads;
 
+option go_package = "./toll_roads";
+
 service TollRoadsService {
     rpc GetTollRoads (TollRoadsRequest) returns (TollRoadsResponse);
 }

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package executor_profile;
 
+option go_package = "./executor_profile";
+
 service ExecutorProfileService {
     rpc GetExecutorProfile (ExecutorProfileRequest) returns (ExecutorProfileResponse);
 }

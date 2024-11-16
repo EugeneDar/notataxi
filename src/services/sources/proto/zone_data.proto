@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package zone_data;
 
+option go_package = "./zone_data";
+
 service ZoneDataService {
     rpc GetZoneData (ZoneDataRequest) returns (ZoneDataResponse);
 }
