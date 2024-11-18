@@ -6,7 +6,6 @@ import os
 import sys
 import string
 from grpc_reflection.v1alpha import reflection
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sources/protobufs'))
 import executor_profile_pb2
 import executor_profile_pb2_grpc
 
