@@ -24,6 +24,8 @@ const (
 
 	ConfigCacheTTL = time.Minute * 1
 	BaseCacheTTL   = time.Minute * 10
+
+	ExecutorTimeOut = time.Second * 5
 )
 
 type ServiceAPI struct {
@@ -128,8 +130,14 @@ func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesReque
 		s.TollRoadsCache.Add(zoneInfo.GetDisplayName(), tollRoadsInfo)
 	}
 
-	executorInfo, err := s.GRPCExecutor.GetExecutorProfile(ctx, &executor_profile.ExecutorProfileRequest{DisplayName: zoneInfo.GetDisplayName()})
+	executorContext, cancel := context.WithTimeout(ctx, ExecutorTimeOut)
+	defer cancel()
+
+	useFallback := false
+
+	executorInfo, err := s.GRPCExecutor.GetExecutorProfile(executorContext, &executor_profile.ExecutorProfileRequest{DisplayName: zoneInfo.GetDisplayName()})
 	if err != nil {
+		useFallback = true
 		executorInfo, err = s.GRPCExecutorFallback.GetExecutorProfile(ctx, &executor_profile.ExecutorProfileRequest{DisplayName: zoneInfo.GetDisplayName()})
 		if err != nil {
 			return nil, err
@@ -155,7 +163,7 @@ func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesReque
 			Rating: executorInfo.GetRating(),
 		},
 		ZoneDisplayName:      zoneInfo.GetDisplayName(),
-		UsedExecutorFallback: false,
+		UsedExecutorFallback: useFallback,
 	}
 
 	return &resp, nil
