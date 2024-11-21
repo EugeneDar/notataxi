@@ -11,5 +11,5 @@ service ConfigService {
 }
 
 message ConfigResponse {
-    map<string, string> settings = 1;
+    int32 min_price = 1;
 }
