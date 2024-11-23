@@ -47,8 +47,7 @@ def toll_roads_service(grpc_channel):
 def zone_data_service(grpc_channel):
     return ZoneDataServiceStub(grpc_channel)
 
-# Constants
-CONCURRENT_REQUESTS = 100  # Number of parallel requests for load testing
+CONCURRENT_REQUESTS = 100
 
 def load_test_function(service_call, request, expected_code=grpc.StatusCode.OK):
     try:
@@ -80,7 +79,6 @@ def test_load_executor_profile_service(executor_profile_service):
         results = [future.result() for future in futures if future.result() is not None]
         print("ExecutorProfileService - Average response time:", sum(results) / len(results))
 
-# Load test for OrderDataService
 def test_load_order_data_service(order_data_service):
     request = OrderDataRequest(order_id="12345")
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONCURRENT_REQUESTS) as executor:
