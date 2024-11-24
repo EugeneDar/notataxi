@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"app/database"
-	"app/requests"
+	"app/src/services/orders/app/database"
+	"app/src/services/orders/app/requests"
 	"fmt"
 	"log"
 

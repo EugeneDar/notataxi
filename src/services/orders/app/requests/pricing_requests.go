@@ -1,8 +1,8 @@
 package requests
 
 import (
-	"app/model"
-	"app/utils"
+	"app/src/services/orders/app/model"
+	"app/src/services/orders/app/utils"
 )
 
 func GetOrderInfo(orderId string, executorId string, zoneId string) model.AssignedOrder {

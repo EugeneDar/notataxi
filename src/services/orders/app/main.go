@@ -1,9 +1,9 @@
 package main
 
 import (
-	"app/controllers"
-	"app/database"
-	"app/utils"
+	"app/src/services/orders/app/controllers"
+	"app/src/services/orders/app/database"
+	"app/src/services/orders/app/utils"
 	"fmt"
 	"log"
 

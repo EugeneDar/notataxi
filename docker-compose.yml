@@ -11,14 +11,16 @@ services:
       POSTGRES_USER: ${ORDERS_DB_USER}
       POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
     volumes:
-      - ./database/data/:/var/lib/postgresql/data
-      - ./database/init_migrations:/docker-entrypoint-initdb.d
+      - ./src/services/orders/database/data/:/var/lib/postgresql/data
+      - ./src/services/orders/database/init_migrations:/docker-entrypoint-initdb.d
     networks:
       - orders-service-network
   
   orders_app:
     container_name: orders_app
-    build: .
+    build:
+      context: .
+      dockerfile: src/services/orders/Dockerfile
     depends_on:
       - orders_db
     environment:

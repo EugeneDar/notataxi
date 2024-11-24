@@ -1,10 +1,9 @@
 FROM golang:1.23 AS builder
-WORKDIR /app
 
-COPY app .
+WORKDIR /go
 
-RUN go mod download
+COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -trimpath -mod=readonly -o /go/bin/app
+RUN go build -o /go/bin/orders src/services/orders/app/main.go
 
-ENTRYPOINT [ "/go/bin/app" ]
+ENTRYPOINT [ "/go/bin/orders" ]

@@ -1,8 +1,8 @@
 package database
 
 import (
-	"app/model"
-	"app/utils"
+	"app/src/services/orders/app/model"
+	"app/src/services/orders/app/utils"
 	"database/sql"
 	"errors"
 	"fmt"
