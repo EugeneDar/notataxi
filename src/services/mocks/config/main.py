@@ -28,10 +28,7 @@ def random_sublist(list, subset_size, seed):
 class ConfigServiceServicer(config_pb2_grpc.ConfigServiceServicer):
     def GetConfig(self, request, context):
         response = config_pb2.ConfigResponse(
-            settings={
-                'coin_coeff_settings_maximum': '3',
-                'coin_coeff_settings_fallback': '1',
-            },
+            min_price=60,
         )
         return response
 

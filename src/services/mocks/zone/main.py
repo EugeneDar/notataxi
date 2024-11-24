@@ -10,6 +10,10 @@ import zone_data_pb2_grpc
 
 class ZoneDataServiceServicer(zone_data_pb2_grpc.ZoneDataServiceServicer):
     def GetZoneData(self, request, context):
+        if len(request.zone_id) == 0:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            return zone_data_pb2.ZoneDataResponse()
+
         params = random.choice([
             ('Lyubertsy', 1.5), 
             ('Severodvinsk', 1.0), 
