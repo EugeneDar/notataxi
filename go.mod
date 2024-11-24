@@ -6,7 +6,6 @@ toolchain go1.22.9
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/golang/protobuf v1.5.4
 	github.com/jackc/pgx/v4 v4.18.3
 )
 
