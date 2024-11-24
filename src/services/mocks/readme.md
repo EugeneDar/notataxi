@@ -1,7 +1,26 @@
+Просто собрать:
 ```
 sudo docker build -t config-mock .
-sudo docker run -p 50051:50051 config-mock
+sudo docker run -p 9090:9090 config-mock
+```
 
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v1
-docker push cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v1
+Собрать и опубликовать в Container Registry:
+```
+sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v*
+docker push cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v*
+
+sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v*
+docker push cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v*
+
+sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v*
+docker push cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v*
+
+sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v*
+docker push cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v*
+
+sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/toll-roads-mock:v*
+docker push cr.yandex/crpatchv2fnnbum2cdu7/toll-roads-mock:v*
+
+sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v*
+docker push cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v*
 ```
