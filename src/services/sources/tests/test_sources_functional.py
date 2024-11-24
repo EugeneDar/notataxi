@@ -19,17 +19,17 @@ from zone_data_pb2 import ZoneDataRequest
 
 @pytest.fixture(scope="module")
 def grpc_channel_config():
-    with grpc.insecure_channel('localhost:9090') as channel:
+    with grpc.insecure_channel('51.250.41.223:9090') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_executor_profile():
-    with grpc.insecure_channel('localhost:9094') as channel:
+    with grpc.insecure_channel('51.250.41.223:9094') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_order_data():
-    with grpc.insecure_channel('localhost:9091') as channel:
+    with grpc.insecure_channel('51.250.41.223:9091') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
@@ -39,12 +39,12 @@ def grpc_channel_sources():
 
 @pytest.fixture(scope="module")
 def grpc_channel_toll_roads():
-    with grpc.insecure_channel('localhost:9093') as channel:
+    with grpc.insecure_channel('51.250.41.223:9093') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_zone_data():
-    with grpc.insecure_channel('localhost:9092') as channel:
+    with grpc.insecure_channel('51.250.41.223:9092') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
