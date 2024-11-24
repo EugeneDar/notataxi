@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-service
+spec:
+  type: LoadBalancer  # Сервис будет доступен через внешний IP
+  selector:
+    app: orders
+  ports:
+    - name: grpc-8080
+      protocol: TCP
+      port: 8080 # Внешний порт для доступа
+      targetPort: 8080 # Порт внутри контейнера
