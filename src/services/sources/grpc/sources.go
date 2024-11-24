@@ -46,32 +46,32 @@ type ServiceAPI struct {
 }
 
 func Register(gRPC *grpc.Server) error {
-	configCon, err := grpc.NewClient("mocks-service.default.svc.cluster.local:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	configCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
 
-	orderDataCon, err := grpc.NewClient("mocks-service.default.svc.cluster.local:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	orderDataCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	zoneCon, err := grpc.NewClient("mocks-service.default.svc.cluster.local:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	zoneCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tollRoadsCon, err := grpc.NewClient("mocks-service.default.svc.cluster.local:9093", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tollRoadsCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9093", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	executorCon, err := grpc.NewClient("mocks-service.default.svc.cluster.local:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	executorCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	executorFallbackCon, err := grpc.NewClient("localhost:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	executorFallbackCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
