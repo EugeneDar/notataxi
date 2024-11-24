@@ -2,3 +2,4 @@
 src/services/sources/protobufs/*
 **_pb2.py
 **_pb2_grpc.py
+go.sum
