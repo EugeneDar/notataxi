@@ -37,9 +37,12 @@ services:
       - orders-service-network
 
   sources_service:
+    container_name: sources_app
     build:
       context: .
-      dockerfile: ./src/services/sources/app/Dockerfile
+      dockerfile: src/services/sources/Dockerfile
+    ports:
+      - "9000:9000"
     restart: always
 
   pgadmin:

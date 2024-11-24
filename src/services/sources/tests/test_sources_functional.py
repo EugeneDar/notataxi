@@ -73,7 +73,6 @@ def zone_data_service(grpc_channel_zone_data):
 
 def test_get_config(config_service):
     response = config_service.GetConfig(empty_pb2.Empty())
-    # assert isinstance(response, ConfigResponse)
     assert isinstance(response.min_price, int)
     assert 1 <= response.min_price <= 1000, "Min price out of range"
 
@@ -116,12 +115,6 @@ def test_get_sources_valid_order(sources_service):
     assert response.price_components.coin_coeff >= 1, "Coin coefficient should be >= 1"
     assert isinstance(response.executor_profile.rating, float)
     assert 0 <= response.executor_profile.rating <= 5, "Rating out of range"
-
-# def test_get_sources_empty_executor(sources_service):
-#     request = SourcesRequest(order_id="order_123", executor_id="")
-#     with pytest.raises(grpc.RpcError) as exc_info:
-#         sources_service.GetOrderInfo(request)
-#     assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return INVALID_ARGUMENT for empty executor_id"
 
 def test_get_toll_roads_valid_request(toll_roads_service):
     request = TollRoadsRequest(display_name="Highway 101")
