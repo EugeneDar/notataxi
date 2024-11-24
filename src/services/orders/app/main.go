@@ -4,6 +4,7 @@ import (
 	"app/src/services/orders/app/controllers"
 	"app/src/services/orders/app/database"
 	"app/src/services/orders/app/utils"
+
 	"fmt"
 	"log"
 
@@ -18,15 +19,21 @@ func main() {
 	}
 
 	r := gin.Default()
-	r.PUT("/order/assign", controllers.AssignOrderRequestHandler)
-	r.GET("/order/acquire", controllers.AcquireOrderRequestHandler)
-	r.POST("/order/cancel", controllers.CancelOrderRequestHandler)
+
+	service, err := controllers.NewService()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	r.PUT("/order/assign", service.AssignOrderRequestHandler)
+	r.GET("/order/acquire", service.AcquireOrderRequestHandler)
+	r.POST("/order/cancel", service.CancelOrderRequestHandler)
 
 	testing := r.Group("/testing")
-    {
-		testing.POST("/clean-database", controllers.CleanDatabaseRequestHandler)
-        testing.POST("/clean-test-orders", controllers.CleanTestOrdersHandler)
-    }
+	{
+		testing.POST("/clean-database", service.CleanDatabaseRequestHandler)
+		testing.POST("/clean-test-orders", service.CleanTestOrdersHandler)
+	}
 
 	listeningLine := fmt.Sprintf(":%s", utils.GetenvSafe("ORDERS_SERVICE_PORT"))
 	log.Printf("listening at %s\n", listeningLine)

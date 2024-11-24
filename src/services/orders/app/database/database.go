@@ -1,14 +1,11 @@
 package database
 
 import (
-	"app/src/services/orders/app/model"
 	"app/src/services/orders/app/utils"
+	"app/src/services/sources/protobufs/sources"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
-
-	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -31,13 +28,13 @@ func EstablishConnection() (err error) {
 	return nil
 }
 
-func AddAssignedOrder(assignedOrder *model.AssignedOrder) error {
+func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
 	_, err := db.Exec(`
 		UPDATE assigned_orders
 		SET ExecutionStatus = 'completed'
 		WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')
 			AND ExecutorId = $1`,
-		assignedOrder.ExecutorId)
+		assignedOrder.GetExecutorProfile().GetId())
 	if err != nil {
 		return err
 	}
@@ -55,21 +52,21 @@ func AddAssignedOrder(assignedOrder *model.AssignedOrder) error {
 				AssignTime,
 				LastAcquireTime
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NULL)`,
-		assignedOrder.AssignedOrderId,
-		assignedOrder.OrderId,
-		assignedOrder.ExecutorId,
-		assignedOrder.ExecutionStatus,
-		assignedOrder.CoinCoefficient,
-		assignedOrder.CoinBonusAmount,
-		assignedOrder.FinalCoinAmount,
-		assignedOrder.ZoneName,
-		assignedOrder.HasExecutorFallbackBeenUsed,
+		    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NULL)`,
+		"AssignedOrderId", // TODO generate UUID?
+		assignedOrder.GetOrderId(),
+		assignedOrder.GetExecutorProfile().GetId(),
+		"ExecutionStatus", // TODO not enough info in sources service
+		assignedOrder.GetPriceComponents().GetCoinCoeff(),
+		assignedOrder.GetPriceComponents().GetBonusAmount(),
+		assignedOrder.GetFinalCoinAmount(),
+		assignedOrder.GetZoneDisplayName(),
+		assignedOrder.GetUsedExecutorFallback(),
 	)
 	return err
 }
 
-func AcquireAssignedOrder(executorId string) (*model.AssignedOrder, error) {
+func AcquireAssignedOrder(executorId string) (*sources.SourcesResponse, error) {
 	row := db.QueryRow(`
 		UPDATE assigned_orders
 		SET
@@ -92,22 +89,24 @@ func AcquireAssignedOrder(executorId string) (*model.AssignedOrder, error) {
 			LastAcquireTime`,
 		executorId,
 	)
-	var assignedOrder model.AssignedOrder
+	var assignedOrder sources.SourcesResponse
 	var zoneName sql.NullString
-	var lastAcquireTime sql.NullTime
+
+	assignedOrderId := ""
+	status := ""
+
 	err := row.Scan(
-		&assignedOrder.AssignedOrderId,
+		&assignedOrderId,
 		&assignedOrder.OrderId,
-		&assignedOrder.ExecutorId,
-		&assignedOrder.ExecutionStatus,
-		&assignedOrder.CoinCoefficient,
-		&assignedOrder.CoinBonusAmount,
+		&assignedOrder.ExecutorProfile.Id,
+		&status,
+		&assignedOrder.GetPriceComponents().CoinCoeff,
+		&assignedOrder.GetPriceComponents().BonusAmount,
 		&assignedOrder.FinalCoinAmount,
 		&zoneName,
-		&assignedOrder.HasExecutorFallbackBeenUsed,
-		&assignedOrder.AssignTime,
-		&lastAcquireTime,
+		&assignedOrder.UsedExecutorFallback,
 	)
+
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -115,15 +114,11 @@ func AcquireAssignedOrder(executorId string) (*model.AssignedOrder, error) {
 		return nil, err
 	}
 	if zoneName.Valid {
-		assignedOrder.ZoneName = zoneName.String
+		assignedOrder.ZoneDisplayName = zoneName.String
 	} else {
-		assignedOrder.ZoneName = "unknown"
+		assignedOrder.ZoneDisplayName = "unknown"
 	}
-	if lastAcquireTime.Valid {
-		assignedOrder.LastAcquireTime = lastAcquireTime.Time
-	} else {
-		return nil, errors.New("unexpected unset AcquireTime during acquiring order")
-	}
+
 	return &assignedOrder, nil
 }
 
@@ -153,11 +148,11 @@ func CleanDatabase() error {
 }
 
 func CleanTestOrders() error {
-    _, err := db.Exec(`
+	_, err := db.Exec(`
         UPDATE assigned_orders 
         SET ExecutionStatus = 'cancelled' 
         WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')
             AND ExecutorId LIKE 'test_%'
     `)
-    return err
+	return err
 }
