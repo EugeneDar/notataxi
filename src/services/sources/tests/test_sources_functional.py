@@ -34,7 +34,7 @@ def grpc_channel_order_data():
 
 @pytest.fixture(scope="module")
 def grpc_channel_sources():
-    with grpc.insecure_channel('localhost:9000') as channel:
+    with grpc.insecure_channel('158.160.131.119:9000') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
