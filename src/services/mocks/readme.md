@@ -1,7 +1,7 @@
 Просто собрать:
 ```
 sudo docker build -t config-mock .
-sudo docker run -p 9000:9000 config-mock
+sudo docker run -p 9090:9090 config-mock
 ```
 
 Собрать и опубликовать в Container Registry:
