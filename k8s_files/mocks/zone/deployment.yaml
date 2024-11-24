@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zone-mock-deployment-v1
+  labels:
+    app: zone-mock
+    version: v1
+spec:
+  replicas: 1  # Число реплик приложения
+  selector:
+    matchLabels:
+      app: zone-mock
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: zone-mock
+        version: v1
+    spec:
+      containers:
+        - name: zone-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v1
+          ports:
+            - containerPort: 9092

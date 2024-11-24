@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-mock-deployment-v1
+  labels:
+    app: config-mock
+    version: v1
+spec:
+  replicas: 1  # Число реплик приложения
+  selector:
+    matchLabels:
+      app: config-mock
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: config-mock
+        version: v1
+    spec:
+      containers:
+        - name: config-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v1
+          ports:
+            - containerPort: 9090

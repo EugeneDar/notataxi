@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-data-mock-deployment-v1
+  labels:
+    app: order-data-mock
+    version: v1
+spec:
+  replicas: 1  # Число реплик приложения
+  selector:
+    matchLabels:
+      app: order-data-mock
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: order-data-mock
+        version: v1
+    spec:
+      containers:
+        - name: order-data-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v1
+          ports:
+            - containerPort: 9091
