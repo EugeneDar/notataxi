@@ -4,7 +4,10 @@ go 1.22.7
 
 toolchain go1.22.9
 
-require github.com/gin-gonic/gin v1.10.0
+require (
+	github.com/gin-gonic/gin v1.10.0
+	github.com/golang/protobuf v1.5.4
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
@@ -32,7 +35,7 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.27.0 // indirect
 	google.golang.org/grpc v1.68.0
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/protobuf v1.35.2
 )
 
 require (
