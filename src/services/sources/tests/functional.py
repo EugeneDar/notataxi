@@ -49,27 +49,27 @@ def grpc_channel_zone_data():
 
 @pytest.fixture(scope="module")
 def config_service(grpc_channel_config):
-    return ConfigServiceStub(grpc_channel)
+    return ConfigServiceStub(grpc_channel_config)
 
 @pytest.fixture(scope="module")
 def executor_profile_service(grpc_channel_executor_profile):
-    return ExecutorProfileServiceStub(grpc_channel)
+    return ExecutorProfileServiceStub(grpc_channel_executor_profile)
 
 @pytest.fixture(scope="module")
 def order_data_service(grpc_channel_order_data):
-    return OrderDataServiceStub(grpc_channel)
+    return OrderDataServiceStub(grpc_channel_order_data)
 
 @pytest.fixture(scope="module")
 def sources_service(grpc_channel_sources):
-    return SourcesServiceStub(grpc_channel)
+    return SourcesServiceStub(grpc_channel_sources)
 
 @pytest.fixture(scope="module")
 def toll_roads_service(grpc_channel_toll_roads):
-    return TollRoadsServiceStub(grpc_channel)
+    return TollRoadsServiceStub(grpc_channel_toll_roads)
 
 @pytest.fixture(scope="module")
 def zone_data_service(grpc_channel_zone_data):
-    return ZoneDataServiceStub(grpc_channel)
+    return ZoneDataServiceStub(grpc_channel_zone_data)
 
 def test_get_config(config_service):
     response = config_service.GetConfig(empty_pb2.Empty())
