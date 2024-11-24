@@ -7,15 +7,14 @@ import (
 	"app/src/services/sources/protobufs/sources"
 	"app/src/services/sources/protobufs/toll_roads"
 	"app/src/services/sources/protobufs/zone_data"
-	"log"
-
-	"google.golang.org/grpc/credentials/insecure"
 
 	"context"
+	"log"
 	"time"
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (

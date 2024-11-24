@@ -1,6 +1,8 @@
-COPY . /app
+FROM golang:latest
 
-WORKDIR /src/services/sources/app
+COPY . /runable
+
+WORKDIR /runable/src/services/sources/app
 
 RUN go build main.go
 

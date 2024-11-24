@@ -36,6 +36,12 @@ services:
     networks:
       - orders-service-network
 
+  sources_service:
+    build:
+      context: .
+      dockerfile: ./src/services/sources/app/Dockerfile
+    restart: always
+
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4:8
