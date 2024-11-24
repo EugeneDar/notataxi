@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mocks-service
+spec:
+  type: LoadBalancer  # Сервис будет доступен через внешний IP
+  selector:
+    app: mocks
+  ports:
+    - name: grpc-9090
+      protocol: TCP
+      port: 9090 # Внешний порт для доступа
+      targetPort: 9090 # Порт внутри контейнера
+    - name: grpc-9091
+      protocol: TCP
+      port: 9091 # Внешний порт для доступа
+      targetPort: 9091 # Порт внутри контейнера
+    - name: grpc-9092
+      protocol: TCP
+      port: 9092 # Внешний порт для доступа
+      targetPort: 9092 # Порт внутри контейнера
+    - name: grpc-9093
+      protocol: TCP
+      port: 9093 # Внешний порт для доступа
+      targetPort: 9093 # Порт внутри контейнера
+    - name: grpc-9094
+      protocol: TCP
+      port: 9094 # Внешний порт для доступа
+      targetPort: 9094 # Порт внутри контейнера
+    - name: grpc-9095
+      protocol: TCP
+      port: 9095 # Внешний порт для доступа
+      targetPort: 9095 # Порт внутри контейнера
+  sessionAffinity: None

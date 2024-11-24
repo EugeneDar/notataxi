@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mocks-deployment-v1
+  labels:
+    app: mocks
+    version: v1
+spec:
+  replicas: 1  # Число реплик приложения
+  selector:
+    matchLabels:
+      app: mocks
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: mocks
+        version: v1
+    spec:
+      containers:
+        - name: config-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v1
+          ports:
+            - containerPort: 9090
+        - name: executor-fallback-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v1
+          ports:
+            - containerPort: 9095
+        - name: executor-profile-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v1
+          ports:
+            - containerPort: 9094
+        - name: order-data-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v1
+          ports:
+            - containerPort: 9091
+        - name: toll-roads-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/toll-roads-mock:v1
+          ports:
+            - containerPort: 9093
+        - name: zone-mock
+          image: cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v1
+          ports:
+            - containerPort: 9092
