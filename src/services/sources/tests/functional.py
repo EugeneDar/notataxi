@@ -61,7 +61,7 @@ def order_data_service(grpc_channel_order_data):
 
 @pytest.fixture(scope="module")
 def sources_service(grpc_channel_sources):
-    return SourcesServiceStub(grpc_channel_sourcesl)
+    return SourcesServiceStub(grpc_channel_sources)
 
 @pytest.fixture(scope="module")
 def toll_roads_service(grpc_channel_toll_roads):
