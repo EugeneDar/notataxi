@@ -1,35 +1,67 @@
 package database
 
 import (
-	"app/src/services/orders/app/utils"
 	"app/src/services/sources/protobufs/sources"
 	"database/sql"
 	"fmt"
-	"log"
+
+	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
+
+	"github.com/google/uuid"
+
+	"github.com/jackc/pgx/v4"
 )
 
-var db *sql.DB
+const (
+	host     = "rc1b-xy6y7apt7j7jdpc7.mdb.yandexcloud.net,rc1d-opy4a78yulgzu7z2.mdb.yandexcloud.net"
+	port     = 6432
+	user     = "user1"
+	password = "NgdXRLUNn67d8tR"
+	dbname   = "db1"
+	ca       = "/go/src/services/orders/database/root.crt"
+	timeZone = "Europe/Moscow"
+)
+
+var db *pgx.Conn
 
 func EstablishConnection() (err error) {
-	connectionString := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=%s",
-		utils.GetenvSafe("POSTGRES_HOST"),
-		utils.GetenvSafe("POSTGRES_PORT"),
-		utils.GetenvSafe("POSTGRES_USER"),
-		utils.GetenvSafe("POSTGRES_PASSWORD"),
-		utils.GetenvSafe("POSTGRES_DB"),
-		utils.GetenvSafe("TIME_ZONE"),
-	)
-	log.Printf("attempting to establish connection with database at %s\n", connectionString)
-	db, err = sql.Open("postgres", connectionString)
+	rootCertPool := x509.NewCertPool()
+	pem, err := ioutil.ReadFile(ca)
+	if err != nil {
+		panic(err)
+	}
+
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		panic("Failed to append PEM")
+	}
+
+	connstring := fmt.Sprintf(
+		"host=%s port=%d dbname=%s user=%s password=%s TimeZone=%s sslmode=verify-full target_session_attrs=read-write",
+		host, port, dbname, user, password, timeZone)
+
+	connConfig, err := pgx.ParseConfig(connstring)
+	if err != nil {
+		panic(fmt.Sprintf("Unable to parse config: %v\n", err))
+	}
+
+	connConfig.TLSConfig = &tls.Config{
+		RootCAs:            rootCertPool,
+		InsecureSkipVerify: true,
+	}
+
+	db, err = pgx.ConnectConfig(context.Background(), connConfig)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
-	_, err := db.Exec(`
+	_, err := db.Exec(context.Background(), `
 		UPDATE assigned_orders
 		SET ExecutionStatus = 'completed'
 		WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')
@@ -38,7 +70,7 @@ func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`
+	_, err = db.Exec(context.Background(), `
 		INSERT INTO assigned_orders (
 				AssignedOrderId,
 				OrderId,
@@ -53,10 +85,10 @@ func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
 				LastAcquireTime
 			)
 		    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NULL)`,
-		"AssignedOrderId", // TODO generate UUID?
+		uuid.New().String(),
 		assignedOrder.GetOrderId(),
 		assignedOrder.GetExecutorProfile().GetId(),
-		"ExecutionStatus", // TODO not enough info in sources service
+		"assigned",
 		assignedOrder.GetPriceComponents().GetCoinCoeff(),
 		assignedOrder.GetPriceComponents().GetBonusAmount(),
 		assignedOrder.GetFinalCoinAmount(),
@@ -67,7 +99,7 @@ func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
 }
 
 func AcquireAssignedOrder(executorId string) (*sources.SourcesResponse, error) {
-	row := db.QueryRow(`
+	row := db.QueryRow(context.Background(), `
 		UPDATE assigned_orders
 		SET
 			ExecutionStatus = 'acquired',
@@ -122,8 +154,8 @@ func AcquireAssignedOrder(executorId string) (*sources.SourcesResponse, error) {
 	return &assignedOrder, nil
 }
 
-func CancelAssignedOrder(orderId string) (bool, error) {
-	res, err := db.Exec(`
+func CancelAssignedOrder(orderId string) bool {
+	res, err := db.Exec(context.Background(), `
 		UPDATE assigned_orders
 		SET ExecutionStatus = 'cancelled'
 		WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')
@@ -132,14 +164,14 @@ func CancelAssignedOrder(orderId string) (bool, error) {
 		orderId,
 	)
 	if err != nil {
-		return false, err
+		return false
 	}
-	affected, err := res.RowsAffected()
-	return affected == 1, err
+	affected := res.RowsAffected()
+	return affected == 1
 }
 
 func CleanDatabase() error {
-	_, err := db.Exec(`
+	_, err := db.Exec(context.Background(), `
         UPDATE assigned_orders 
         SET ExecutionStatus = 'completed' 
         WHERE ExecutionStatus IN ('assigned', 'acquired', 'cancelled')
@@ -148,7 +180,7 @@ func CleanDatabase() error {
 }
 
 func CleanTestOrders() error {
-	_, err := db.Exec(`
+	_, err := db.Exec(context.Background(), `
         UPDATE assigned_orders 
         SET ExecutionStatus = 'cancelled' 
         WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')

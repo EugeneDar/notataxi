@@ -6,9 +6,10 @@ import (
 	"context"
 
 	"fmt"
+	"log"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,7 @@ type Service struct {
 }
 
 func NewService() (*Service, error) {
-	conSources, err := grpc.Dial("sources:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conSources, err := grpc.Dial("sources.wholeservicenamespace.svc.cluster.local:9000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,12 +94,7 @@ func (s *Service) CancelOrderRequestHandler(c *gin.Context) {
 		return
 	}
 
-	found, err := database.CancelAssignedOrder(orderId)
-	if err != nil {
-		c.JSON(500, gin.H{"message": "Unknown error"})
-		log.Printf("Error executing CancelAssignedOrder: %s\n", err.Error())
-		return
-	}
+	found := database.CancelAssignedOrder(orderId)
 	if !found {
 		c.JSON(200, gin.H{"message": fmt.Sprintf("AssignedOrder with OrderId %s does not exist or has already been canceled", orderId)})
 		log.Printf("[Info] AssignedOrder with OrderId %s does not exist or has already been canceled or completed\n", orderId)
