@@ -80,3 +80,21 @@ func CancelOrderRequestHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Successfully canceled"})
 	log.Printf("[Info] Have just cancel order with OrderId=%s\n", orderId)
 }
+
+func CleanDatabaseRequestHandler(c *gin.Context) {
+	if err := database.CleanDatabase(); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to clean database"})
+		log.Printf("Error executing CleanDatabase: %s\n", err.Error())
+		return
+	}
+	c.JSON(200, gin.H{"message": "Database cleaned successfully"})
+}
+
+func CleanTestOrdersHandler(c *gin.Context) {
+    if err := database.CleanTestOrders(); err != nil {
+        c.JSON(500, gin.H{"error": fmt.Sprintf("Failed to clean test orders: %v", err)})
+        log.Printf("Error executing CleanTestOrders: %s\n", err.Error())
+        return
+    }
+    c.JSON(200, gin.H{"message": "Test orders cleaned successfully"})
+}

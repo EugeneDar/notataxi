@@ -22,6 +22,12 @@ func main() {
 	r.GET("/order/acquire", controllers.AcquireOrderRequestHandler)
 	r.POST("/order/cancel", controllers.CancelOrderRequestHandler)
 
+	testing := r.Group("/testing")
+    {
+		testing.POST("/clean-database", controllers.CleanDatabaseRequestHandler)
+        testing.POST("/clean-test-orders", controllers.CleanTestOrdersHandler)
+    }
+
 	listeningLine := fmt.Sprintf(":%s", utils.GetenvSafe("ORDERS_SERVICE_PORT"))
 	log.Printf("listening at %s\n", listeningLine)
 	r.Run(listeningLine)

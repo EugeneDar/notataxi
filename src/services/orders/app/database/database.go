@@ -142,3 +142,22 @@ func CancelAssignedOrder(orderId string) (bool, error) {
 	affected, err := res.RowsAffected()
 	return affected == 1, err
 }
+
+func CleanDatabase() error {
+	_, err := db.Exec(`
+        UPDATE assigned_orders 
+        SET ExecutionStatus = 'completed' 
+        WHERE ExecutionStatus IN ('assigned', 'acquired', 'cancelled')
+    `)
+	return err
+}
+
+func CleanTestOrders() error {
+    _, err := db.Exec(`
+        UPDATE assigned_orders 
+        SET ExecutionStatus = 'cancelled' 
+        WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')
+            AND ExecutorId LIKE 'test_%'
+    `)
+    return err
+}
