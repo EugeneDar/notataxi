@@ -35,7 +35,6 @@ class GRPCUser(User):
                 try:
                     print(f"Attempting to connect to {GRPC_HOST} (attempt {attempt + 1}/3)")
                     self.channel = grpc.insecure_channel(GRPC_HOST)
-                    # Уменьшаем timeout для быстрого фидбека
                     grpc.channel_ready_future(self.channel).result(timeout=2)
                     self.client = SourcesServiceStub(self.channel)
                     self.connection_successful = True
@@ -43,7 +42,7 @@ class GRPCUser(User):
                     break
                 except grpc.FutureTimeoutError:
                     print(f"Connection attempt {attempt + 1} failed to {GRPC_HOST}")
-                    if attempt < 2:  # Don't sleep on last attempt
+                    if attempt < 2:
                         time.sleep(1)
             
             if not self.connection_successful:
