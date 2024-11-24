@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// todo(eugenedar): implement a real cache
+// todo(eugenedar): implement a real database
 type Database struct {
 	data map[string]interface{}
 	mu   sync.RWMutex
