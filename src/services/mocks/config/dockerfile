@@ -1,0 +1,9 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY main.py .
+COPY config_pb2_grpc.py .
+COPY config_pb2.py .
+RUN pip install grpcio grpcio-tools grpcio-reflection
+EXPOSE 9090
+CMD ["python3", "main.py"]

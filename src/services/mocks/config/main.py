@@ -6,7 +6,6 @@ import os
 import sys
 import string
 from grpc_reflection.v1alpha import reflection
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sources/protobufs'))
 import config_pb2
 import config_pb2_grpc
 
@@ -29,10 +28,7 @@ def random_sublist(list, subset_size, seed):
 class ConfigServiceServicer(config_pb2_grpc.ConfigServiceServicer):
     def GetConfig(self, request, context):
         response = config_pb2.ConfigResponse(
-            settings={
-                'coin_coeff_settings_maximum': '3',
-                'coin_coeff_settings_fallback': '1',
-            },
+            min_price=60,
         )
         return response
 
@@ -45,7 +41,7 @@ def serve():
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    port = 50051
+    port = 9090
     server.add_insecure_port(f'[::]:{port}')
     server.start()
     print(f"Server started, listening on port {port}.")

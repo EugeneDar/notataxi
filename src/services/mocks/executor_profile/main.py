@@ -6,7 +6,6 @@ import os
 import sys
 import string
 from grpc_reflection.v1alpha import reflection
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sources/protobufs'))
 import executor_profile_pb2
 import executor_profile_pb2_grpc
 
@@ -48,7 +47,7 @@ def serve():
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    port = 50051
+    port = 9094
     server.add_insecure_port(f'[::]:{port}')
     server.start()
     print(f"Server started, listening on port {port}.")

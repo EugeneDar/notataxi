@@ -5,7 +5,6 @@ import random
 import os
 import sys
 from grpc_reflection.v1alpha import reflection
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../sources/protobufs'))
 import toll_roads_pb2
 import toll_roads_pb2_grpc
 
@@ -35,7 +34,7 @@ def serve():
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    port = 50051
+    port = 9093
     server.add_insecure_port(f'[::]:{port}')
     server.start()
     print(f"Server started, listening on port {port}.")

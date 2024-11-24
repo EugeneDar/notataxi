@@ -10,49 +10,72 @@ from executor_profile_pb2_grpc import ExecutorProfileServiceStub
 from executor_profile_pb2 import ExecutorProfileRequest
 from order_data_pb2_grpc import OrderDataServiceStub
 from order_data_pb2 import OrderDataRequest
-from sources_pb2_grpc import OrderInfoServiceStub
-from sources_pb2 import OrderInfoRequest
+from sources_pb2_grpc import SourcesServiceStub
+from sources_pb2 import SourcesRequest
 from toll_roads_pb2_grpc import TollRoadsServiceStub
 from toll_roads_pb2 import TollRoadsRequest
 from zone_data_pb2_grpc import ZoneDataServiceStub
 from zone_data_pb2 import ZoneDataRequest
 
 @pytest.fixture(scope="module")
-def grpc_channel():
-    with grpc.insecure_channel('localhost:50051') as channel:
+def grpc_channel_config():
+    with grpc.insecure_channel('localhost:9090') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
-def config_service(grpc_channel):
+def grpc_channel_executor_profile():
+    with grpc.insecure_channel('localhost:9094') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_order_data():
+    with grpc.insecure_channel('localhost:9091') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_sources():
+    with grpc.insecure_channel('localhost:9000') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_toll_roads():
+    with grpc.insecure_channel('localhost:9093') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_zone_data():
+    with grpc.insecure_channel('localhost:9092') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def config_service(grpc_channel_config):
     return ConfigServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def executor_profile_service(grpc_channel):
+def executor_profile_service(grpc_channel_executor_profile):
     return ExecutorProfileServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def order_data_service(grpc_channel):
+def order_data_service(grpc_channel_order_data):
     return OrderDataServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def order_info_service(grpc_channel):
-    return OrderInfoServiceStub(grpc_channel)
+def sources_service(grpc_channel_sources):
+    return SourcesServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def toll_roads_service(grpc_channel):
+def toll_roads_service(grpc_channel_toll_roads):
     return TollRoadsServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def zone_data_service(grpc_channel):
+def zone_data_service(grpc_channel_zone_data):
     return ZoneDataServiceStub(grpc_channel)
 
 def test_get_config(config_service):
     response = config_service.GetConfig(empty_pb2.Empty())
     # assert isinstance(response, ConfigResponse)
-    assert isinstance(response.settings["coin_coeff_settings_maximum"], str)
-    assert isinstance(response.settings["coin_coeff_settings_fallback"], str)
-    assert 0 <= float(response.settings["coin_coeff_settings_maximum"]) <= 10, "Maximum coeff out of range"
-    assert 0 <= float(response.settings["coin_coeff_settings_fallback"]) <= 10, "Fallback coeff out of range"
+    assert isinstance(response.min_price, int)
+    assert 1 <= response.min_price <= 1000, "Min price out of range"
 
 def test_get_executor_profile_valid_request(executor_profile_service):
     request = ExecutorProfileRequest(display_name="Valid User")
@@ -84,9 +107,9 @@ def test_get_order_data_error_order(order_data_service):
         order_data_service.GetOrderData(request)
     assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty order"
 
-def test_get_order_info_valid_order(order_info_service):
-    request = OrderInfoRequest(order_id="order_123", executor_id="exec_456")
-    response = order_info_service.GetOrderInfo(request)
+def test_get_sources_valid_order(sources_service):
+    request = SourcesRequest(order_id="order_123", executor_id="exec_456")
+    response = sources_service.GetOrderInfo(request)
     assert response.order_id == "order_123"
     assert response.final_coin_amount > 0, "Final coin amount should be positive"
     assert response.price_components.base_coin_amount > 0, "Base coin amount should be positive"
@@ -94,10 +117,10 @@ def test_get_order_info_valid_order(order_info_service):
     assert isinstance(response.executor_profile.rating, float)
     assert 0 <= response.executor_profile.rating <= 5, "Rating out of range"
 
-def test_get_order_info_invalid_executor(order_info_service):
-    request = OrderInfoRequest(order_id="order_123", executor_id="invalid_exec")
+def test_get_sources_invalid_executor(sources_service):
+    request = SourcesRequest(order_id="order_123", executor_id="invalid_exec")
     with pytest.raises(grpc.RpcError) as exc_info:
-        order_info_service.GetOrderInfo(request)
+        sources_service.GetOrderInfo(request)
     assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return NOT_FOUND for invalid executor_id"
 
 def test_get_toll_roads_valid_request(toll_roads_service):
