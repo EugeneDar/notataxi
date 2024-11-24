@@ -47,32 +47,32 @@ type ServiceAPI struct {
 }
 
 func Register(gRPC *grpc.Server) error {
-	configCon, err := grpc.NewClient("config:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	configCon, err := grpc.NewClient("localhost:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
 
-	orderDataCon, err := grpc.NewClient("order_data:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	orderDataCon, err := grpc.NewClient("localhost:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	zoneCon, err := grpc.NewClient("zone_data:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	zoneCon, err := grpc.NewClient("localhost:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tollRoadsCon, err := grpc.NewClient("toll_roads:9093", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tollRoadsCon, err := grpc.NewClient("localhost:9093", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	executorCon, err := grpc.NewClient("executor_profile:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	executorCon, err := grpc.NewClient("localhost:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	executorFallbackCon, err := grpc.NewClient("executor_fallback:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	executorFallbackCon, err := grpc.NewClient("localhost:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func (s *ServiceAPI) PriceCalculate(ctx context.Context, baseCoinAmount, bonusAm
 		}
 		s.ConfigCache.Add("config", configInfo)
 	}
-	return max(int32(float32(baseCoinAmount)*coinCoeff)+bonusAmount, configInfo.MinPrice), nil
+	return max(int32(float32(baseCoinAmount)*coinCoeff)+bonusAmount, configInfo.GetMinPrice()), nil
 }
 
 func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesRequest) (*sources.SourcesResponse, error) {

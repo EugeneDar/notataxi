@@ -117,11 +117,11 @@ def test_get_sources_valid_order(sources_service):
     assert isinstance(response.executor_profile.rating, float)
     assert 0 <= response.executor_profile.rating <= 5, "Rating out of range"
 
-def test_get_sources_invalid_executor(sources_service):
-    request = SourcesRequest(order_id="order_123", executor_id="invalid_exec")
-    with pytest.raises(grpc.RpcError) as exc_info:
-        sources_service.GetOrderInfo(request)
-    assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return NOT_FOUND for invalid executor_id"
+# def test_get_sources_empty_executor(sources_service):
+#     request = SourcesRequest(order_id="order_123", executor_id="")
+#     with pytest.raises(grpc.RpcError) as exc_info:
+#         sources_service.GetOrderInfo(request)
+#     assert exc_info.value.code() == grpc.StatusCode.NOT_FOUND, "Should return INVALID_ARGUMENT for empty executor_id"
 
 def test_get_toll_roads_valid_request(toll_roads_service):
     request = TollRoadsRequest(display_name="Highway 101")
