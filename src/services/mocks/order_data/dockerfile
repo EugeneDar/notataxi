@@ -5,5 +5,5 @@ COPY main.py .
 COPY order_data_pb2_grpc.py .
 COPY order_data_pb2.py .
 RUN pip install grpcio grpcio-tools grpcio-reflection
-EXPOSE 50051
+EXPOSE 9091
 CMD ["python3", "main.py"]

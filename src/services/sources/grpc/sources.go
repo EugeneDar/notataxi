@@ -7,8 +7,9 @@ import (
 	"app/src/services/sources/protobufs/sources"
 	"app/src/services/sources/protobufs/toll_roads"
 	"app/src/services/sources/protobufs/zone_data"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
+
+	"google.golang.org/grpc/credentials/insecure"
 
 	"context"
 	"time"
@@ -51,12 +52,12 @@ func Register(gRPC *grpc.Server) error {
 		return err
 	}
 
-	orderDataCon, err := grpc.NewClient("orders:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	orderDataCon, err := grpc.NewClient("order_data:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	zoneCon, err := grpc.NewClient("zone:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	zoneCon, err := grpc.NewClient("zone_data:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +67,7 @@ func Register(gRPC *grpc.Server) error {
 		log.Fatal(err)
 	}
 
-	executorCon, err := grpc.NewClient("executor:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	executorCon, err := grpc.NewClient("executor_profile:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}

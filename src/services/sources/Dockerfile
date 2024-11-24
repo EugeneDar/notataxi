@@ -7,6 +7,6 @@ COPY . .
 RUN go mod download
 RUN go build -o sources ./app/main.go
 
-EXPOSE 9090
+EXPOSE 9000
 
 CMD ["./sources"]

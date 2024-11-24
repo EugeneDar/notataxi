@@ -5,5 +5,5 @@ COPY main.py .
 COPY toll_roads_pb2_grpc.py .
 COPY toll_roads_pb2.py .
 RUN pip install grpcio grpcio-tools grpcio-reflection
-EXPOSE 50051
+EXPOSE 9093
 CMD ["python3", "main.py"]

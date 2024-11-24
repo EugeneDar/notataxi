@@ -6,8 +6,8 @@ import os
 import sys
 import string
 from grpc_reflection.v1alpha import reflection
-import order_data_pb2
-import order_data_pb2_grpc
+import executor_profile_pb2
+import executor_profile_pb2_grpc
 
 def float_from_str(s):
     h = hash(s)
@@ -20,30 +20,34 @@ def random_string_by_seed(seed, length):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
-class OrderDataServiceServicer(order_data_pb2_grpc.OrderDataServiceServicer):
-    def GetOrderData(self, request, context):
-        if len(request.order_id) == 0:
-            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            return order_data_pb2.OrderDataResponse()
+def random_sublist(list, subset_size, seed):
+    random.seed(seed)
+    return random.sample(list, subset_size)
 
-        response = order_data_pb2.OrderDataResponse(
-            order_id=request.order_id,
-            user_id=random_string_by_seed(hash(request.order_id), 8),
-            zone_id=random_string_by_seed(hash(request.order_id) + 1, 12),
-            base_coin_amount=int(float_from_str(request.order_id) * 300),
+
+class ExecutorProfileServiceServicer(executor_profile_pb2_grpc.ExecutorProfileServiceServicer):
+    def GetExecutorProfile(self, request, context):
+        if len(request.display_name) == 0:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            return executor_profile_pb2.ExecutorProfileResponse()
+
+        response = executor_profile_pb2.ExecutorProfileResponse(
+            id=str(hash(request.display_name) % 500000 + 1),
+            tags=random_sublist(['fast', 'good conversation', 'good music', 'clear car'], 2, hash(request.display_name)),
+            rating=float_from_str(request.display_name) + 4,
         )
         return response
 
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    order_data_pb2_grpc.add_OrderDataServiceServicer_to_server(OrderDataServiceServicer(), server)
+    executor_profile_pb2_grpc.add_ExecutorProfileServiceServicer_to_server(ExecutorProfileServiceServicer(), server)
     SERVICE_NAMES = (
-        order_data_pb2.DESCRIPTOR.services_by_name['OrderDataService'].full_name,
+        executor_profile_pb2.DESCRIPTOR.services_by_name['ExecutorProfileService'].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
-    port = 9091
+    port = 9095
     server.add_insecure_port(f'[::]:{port}')
     server.start()
     print(f"Server started, listening on port {port}.")

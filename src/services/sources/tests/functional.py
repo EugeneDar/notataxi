@@ -18,32 +18,57 @@ from zone_data_pb2_grpc import ZoneDataServiceStub
 from zone_data_pb2 import ZoneDataRequest
 
 @pytest.fixture(scope="module")
-def grpc_channel():
-    with grpc.insecure_channel('localhost:50051') as channel:
+def grpc_channel_config():
+    with grpc.insecure_channel('localhost:9090') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
-def config_service(grpc_channel):
+def grpc_channel_executor_profile():
+    with grpc.insecure_channel('localhost:9094') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_order_data():
+    with grpc.insecure_channel('localhost:9091') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_sources():
+    with grpc.insecure_channel('localhost:9000') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_toll_roads():
+    with grpc.insecure_channel('localhost:9093') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def grpc_channel_zone_data():
+    with grpc.insecure_channel('localhost:9092') as channel:
+        yield channel
+
+@pytest.fixture(scope="module")
+def config_service(grpc_channel_config):
     return ConfigServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def executor_profile_service(grpc_channel):
+def executor_profile_service(grpc_channel_executor_profile):
     return ExecutorProfileServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def order_data_service(grpc_channel):
+def order_data_service(grpc_channel_order_data):
     return OrderDataServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def sources_service(grpc_channel):
+def sources_service(grpc_channel_sources):
     return SourcesServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def toll_roads_service(grpc_channel):
+def toll_roads_service(grpc_channel_toll_roads):
     return TollRoadsServiceStub(grpc_channel)
 
 @pytest.fixture(scope="module")
-def zone_data_service(grpc_channel):
+def zone_data_service(grpc_channel_zone_data):
     return ZoneDataServiceStub(grpc_channel)
 
 def test_get_config(config_service):
