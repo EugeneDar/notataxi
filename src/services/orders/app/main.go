@@ -3,9 +3,7 @@ package main
 import (
 	"app/src/services/orders/app/controllers"
 	"app/src/services/orders/app/database"
-	"app/src/services/orders/app/utils"
 
-	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +33,7 @@ func main() {
 		testing.POST("/clean-test-orders", service.CleanTestOrdersHandler)
 	}
 
-	listeningLine := fmt.Sprintf(":%s", utils.GetenvSafe("ORDERS_SERVICE_PORT"))
+	listeningLine := ":8080"
 	log.Printf("listening at %s\n", listeningLine)
 	r.Run(listeningLine)
 }

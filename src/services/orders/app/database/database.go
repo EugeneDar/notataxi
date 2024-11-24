@@ -4,6 +4,7 @@ import (
 	"app/src/services/sources/protobufs/sources"
 	"database/sql"
 	"fmt"
+	"os"
 
 	"context"
 	"crypto/tls"
@@ -21,7 +22,7 @@ const (
 	user     = "user1"
 	password = "NgdXRLUNn67d8tR"
 	dbname   = "db1"
-	ca       = "/go/src/services/orders/database/root.crt"
+	ca       = "/root/.postgresql/root.crt"
 	timeZone = "Europe/Moscow"
 )
 
@@ -35,16 +36,17 @@ func EstablishConnection() (err error) {
 	}
 
 	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		panic("Failed to append PEM")
+		panic("Failed to append PEM.")
 	}
 
 	connstring := fmt.Sprintf(
-		"host=%s port=%d dbname=%s user=%s password=%s TimeZone=%s sslmode=verify-full target_session_attrs=read-write",
-		host, port, dbname, user, password, timeZone)
+		"host=%s port=%d dbname=%s user=%s password=%s sslmode=verify-full target_session_attrs=read-write",
+		host, port, dbname, user, password)
 
 	connConfig, err := pgx.ParseConfig(connstring)
 	if err != nil {
-		panic(fmt.Sprintf("Unable to parse config: %v\n", err))
+		fmt.Fprintf(os.Stderr, "Unable to parse config: %v\n", err)
+		os.Exit(1)
 	}
 
 	connConfig.TLSConfig = &tls.Config{
@@ -54,9 +56,9 @@ func EstablishConnection() (err error) {
 
 	db, err = pgx.ConnectConfig(context.Background(), connConfig)
 	if err != nil {
-		return err
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
 	}
-
 	return nil
 }
 

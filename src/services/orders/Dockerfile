@@ -4,6 +4,15 @@ WORKDIR /go
 
 COPY . .
 
+RUN apt-get update && \
+    apt-get install wget postgresql-client --yes && \
+    mkdir --parents ~/.postgresql && \
+    wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" \
+         --output-document ~/.postgresql/root.crt && \
+    chmod 0655 ~/.postgresql/root.crt
+
 RUN go build -o /go/bin/orders src/services/orders/app/main.go
+
+EXPOSE 8089
 
 ENTRYPOINT [ "/go/bin/orders" ]
