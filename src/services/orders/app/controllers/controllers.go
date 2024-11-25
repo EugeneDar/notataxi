@@ -19,7 +19,7 @@ type Service struct {
 }
 
 func NewService() (*Service, error) {
-	conSources, err := grpc.Dial("sources.wholeservicenamespace.svc.cluster.local:9000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conSources, err := grpc.Dial("sources-service.wholeservicenamespace.svc.cluster.local:9000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,6 +45,7 @@ func (s *Service) AssignOrderRequestHandler(c *gin.Context) {
 	})
 
 	if err != nil {
+		c.JSON(500, gin.H{"debug": err.Error()})
 		log.Println(err)
 		return
 	}
@@ -55,7 +56,7 @@ func (s *Service) AssignOrderRequestHandler(c *gin.Context) {
 			log.Printf("AssignedOrder with provided orderId=%s already exists\n", orderId)
 			return
 		}
-		c.JSON(500, gin.H{"message": "Unknown error"})
+		c.JSON(500, gin.H{"message": "Unknown error", "debug": err.Error()})
 		log.Printf("Error executing AddAssignedOrder: %s\n", err.Error())
 		return
 	}
@@ -73,7 +74,7 @@ func (s *Service) AcquireOrderRequestHandler(c *gin.Context) {
 
 	orderProfile, err := database.AcquireAssignedOrder(executorId)
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Unknown error"})
+		c.JSON(500, gin.H{"message": "Unknown error", "debug": err.Error()})
 		log.Printf("Error executing AcquireAssignedOrder: %s\n", err.Error())
 		return
 	}
