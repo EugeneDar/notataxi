@@ -85,7 +85,7 @@ def test_get_config(config_service):
     assert 1 <= response.min_price <= 1000, "Min price out of range"
 
 def test_get_executor_profile_valid_request(executor_profile_service):
-    request = ExecutorProfileRequest(display_name="Valid User")
+    request = ExecutorProfileRequest(executor_id="473831424")
     response = executor_profile_service.GetExecutorProfile(request)
     assert response.id
     assert len(response.id) > 0, "ID should not be empty"
@@ -95,7 +95,7 @@ def test_get_executor_profile_valid_request(executor_profile_service):
     assert 0 <= response.rating <= 5, "Rating out of range"
 
 def test_get_executor_profile_empty_name(executor_profile_service):
-    request = ExecutorProfileRequest(display_name="")
+    request = ExecutorProfileRequest(executor_id="")
     with pytest.raises(grpc.RpcError) as exc_info:
         executor_profile_service.GetExecutorProfile(request)
     assert exc_info.value.code() == grpc.StatusCode.INVALID_ARGUMENT, "Should return INVALID_ARGUMENT for empty order"

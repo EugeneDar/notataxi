@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mocks-deployment-v1
+  name: mocks-deployment-v3
   labels:
     app: mocks
-    version: v1
+    version: v3
 spec:
   replicas: 1  # Число реплик приложения
   selector:
     matchLabels:
       app: mocks
-      version: v1
+      version: v3
   template:
     metadata:
       labels:
         app: mocks
-        version: v1
+        version: v3
     spec:
       containers:
         - name: config-mock
@@ -23,11 +23,11 @@ spec:
           ports:
             - containerPort: 9090
         - name: executor-fallback-mock
-          image: cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v1
+          image: cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v3
           ports:
             - containerPort: 9095
         - name: executor-profile-mock
-          image: cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v1
+          image: cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v3
           ports:
             - containerPort: 9094
         - name: order-data-mock
