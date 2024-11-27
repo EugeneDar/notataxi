@@ -3,6 +3,7 @@ package main
 import (
 	"app/src/services/orders/app/controllers"
 	"app/src/services/orders/app/database"
+	"app/src/services/orders/requests"
 
 	"log"
 
@@ -12,25 +13,25 @@ import (
 func main() {
 	err := database.EstablishConnection()
 	for err != nil {
-		log.Println(err, "Error connecting to database: %s; retrying...", err.Error())
+		log.Printf("Error connecting to database: %s; retrying...\n", err.Error())
 		err = database.EstablishConnection()
+	}
+
+	err = requests.ConnectionToSourcesService()
+	for err != nil {
+		log.Fatalf("Error connecting to sources service: %s\n", err.Error())
 	}
 
 	r := gin.Default()
 
-	service, err := controllers.NewService()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	r.PUT("/order/assign", service.AssignOrderRequestHandler)
-	r.GET("/order/acquire", service.AcquireOrderRequestHandler)
-	r.POST("/order/cancel", service.CancelOrderRequestHandler)
+	r.PUT("/order/assign", controllers.AssignOrderRequestHandler)
+	r.GET("/order/acquire", controllers.AcquireOrderRequestHandler)
+	r.POST("/order/cancel", controllers.CancelOrderRequestHandler)
 
 	testing := r.Group("/testing")
 	{
-		testing.POST("/clean-database", service.CleanDatabaseRequestHandler)
-		testing.POST("/clean-test-orders", service.CleanTestOrdersHandler)
+		testing.POST("/clean-database", controllers.CleanDatabaseRequestHandler)
+		testing.POST("/clean-test-orders", controllers.CleanTestOrdersHandler)
 	}
 
 	listeningLine := ":8080"

@@ -4,8 +4,8 @@ CREATE TYPE order_execution_status AS ENUM ('assigned', 'acquired', 'cancelled',
 
 CREATE TABLE assigned_orders (
     AssignedOrderId VARCHAR(36) NOT NULL,  -- uuid as string
-    OrderId VARCHAR(36) NOT NULL,
-    ExecutorId VARCHAR(36) NOT NULL,
+    OrderId VARCHAR(255) NOT NULL,
+    ExecutorId VARCHAR(255) NOT NULL,
     ExecutionStatus order_execution_status NOT NULL,
     CoinCoefficient DOUBLE PRECISION NOT NULL,
     CoinBonusAmount DOUBLE PRECISION NOT NULL,

@@ -7,7 +7,7 @@ spec:
   selector:
     app: orders
   ports:
-    - name: grpc-8080
+    - name: api-8080
       protocol: TCP
       port: 8080 # Внешний порт для доступа
       targetPort: 8080 # Порт внутри контейнера

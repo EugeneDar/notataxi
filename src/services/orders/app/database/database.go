@@ -1,17 +1,15 @@
 package database
 
 import (
-	"app/src/services/sources/protobufs/sources"
-	"database/sql"
-	"fmt"
-	"os"
-
-	"context"
+	"app/src/services/orders/model"
 	"crypto/tls"
 	"crypto/x509"
+	"database/sql"
+	"errors"
+	"fmt"
 	"io/ioutil"
 
-	"github.com/google/uuid"
+	"context"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -22,7 +20,7 @@ const (
 	user     = "user1"
 	password = "NgdXRLUNn67d8tR"
 	dbname   = "db1"
-	ca       = "/root/.postgresql/root.crt"
+	ca       = "/go/src/services/orders/database/root.crt"
 	timeZone = "Europe/Moscow"
 )
 
@@ -45,8 +43,7 @@ func EstablishConnection() (err error) {
 
 	connConfig, err := pgx.ParseConfig(connstring)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to parse config: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("unable to parse config: %v", err)
 	}
 
 	connConfig.TLSConfig = &tls.Config{
@@ -56,21 +53,20 @@ func EstablishConnection() (err error) {
 
 	db, err = pgx.ConnectConfig(context.Background(), connConfig)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("unable to connect to database: %v", err)
 	}
 	return nil
 }
 
-func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
+func AddAssignedOrder(assignedOrder *model.AssignedOrder) (bool, error) {
 	_, err := db.Exec(context.Background(), `
 		UPDATE assigned_orders
 		SET ExecutionStatus = 'completed'
 		WHERE (ExecutionStatus = 'assigned' OR ExecutionStatus = 'acquired')
 			AND ExecutorId = $1`,
-		assignedOrder.GetExecutorProfile().GetId())
+		assignedOrder.ExecutorId)
 	if err != nil {
-		return err
+		return false, err
 	}
 	_, err = db.Exec(context.Background(), `
 		INSERT INTO assigned_orders (
@@ -86,21 +82,24 @@ func AddAssignedOrder(assignedOrder *sources.SourcesResponse) error {
 				AssignTime,
 				LastAcquireTime
 			)
-		    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NULL)`,
-		uuid.New().String(),
-		assignedOrder.GetOrderId(),
-		assignedOrder.GetExecutorProfile().GetId(),
-		"assigned",
-		assignedOrder.GetPriceComponents().GetCoinCoeff(),
-		assignedOrder.GetPriceComponents().GetBonusAmount(),
-		assignedOrder.GetFinalCoinAmount(),
-		assignedOrder.GetZoneDisplayName(),
-		assignedOrder.GetUsedExecutorFallback(),
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NULL)`,
+		assignedOrder.AssignedOrderId,
+		assignedOrder.OrderId,
+		assignedOrder.ExecutorId,
+		assignedOrder.ExecutionStatus,
+		assignedOrder.CoinCoefficient,
+		assignedOrder.CoinBonusAmount,
+		assignedOrder.FinalCoinAmount,
+		assignedOrder.ZoneName,
+		assignedOrder.HasExecutorFallbackBeenUsed,
 	)
-	return err
+	if err != nil && err.Error() == "ERROR: duplicate key value violates unique constraint \"assigned_orders_orderid_key\" (SQLSTATE 23505)" {
+		return false, nil
+	}
+	return true, err
 }
 
-func AcquireAssignedOrder(executorId string) (*sources.SourcesResponse, error) {
+func AcquireAssignedOrder(executorId string) (*model.AssignedOrder, error) {
 	row := db.QueryRow(context.Background(), `
 		UPDATE assigned_orders
 		SET
@@ -123,40 +122,42 @@ func AcquireAssignedOrder(executorId string) (*sources.SourcesResponse, error) {
 			LastAcquireTime`,
 		executorId,
 	)
-	var assignedOrder sources.SourcesResponse
+	var assignedOrder model.AssignedOrder
 	var zoneName sql.NullString
-
-	assignedOrderId := ""
-	status := ""
-
+	var lastAcquireTime sql.NullTime
 	err := row.Scan(
-		&assignedOrderId,
+		&assignedOrder.AssignedOrderId,
 		&assignedOrder.OrderId,
-		&assignedOrder.ExecutorProfile.Id,
-		&status,
-		&assignedOrder.GetPriceComponents().CoinCoeff,
-		&assignedOrder.GetPriceComponents().BonusAmount,
+		&assignedOrder.ExecutorId,
+		&assignedOrder.ExecutionStatus,
+		&assignedOrder.CoinCoefficient,
+		&assignedOrder.CoinBonusAmount,
 		&assignedOrder.FinalCoinAmount,
 		&zoneName,
-		&assignedOrder.UsedExecutorFallback,
+		&assignedOrder.HasExecutorFallbackBeenUsed,
+		&assignedOrder.AssignTime,
+		&lastAcquireTime,
 	)
-
-	if err == sql.ErrNoRows {
+	if err != nil && err.Error() == "no rows in result set" {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
 	if zoneName.Valid {
-		assignedOrder.ZoneDisplayName = zoneName.String
+		assignedOrder.ZoneName = zoneName.String
 	} else {
-		assignedOrder.ZoneDisplayName = "unknown"
+		assignedOrder.ZoneName = "unknown"
 	}
-
+	if lastAcquireTime.Valid {
+		assignedOrder.LastAcquireTime = lastAcquireTime.Time
+	} else {
+		return nil, errors.New("unexpected unset AcquireTime during acquiring order")
+	}
 	return &assignedOrder, nil
 }
 
-func CancelAssignedOrder(orderId string) bool {
+func CancelAssignedOrder(orderId string) (bool, error) {
 	res, err := db.Exec(context.Background(), `
 		UPDATE assigned_orders
 		SET ExecutionStatus = 'cancelled'
@@ -166,10 +167,10 @@ func CancelAssignedOrder(orderId string) bool {
 		orderId,
 	)
 	if err != nil {
-		return false
+		return false, err
 	}
 	affected := res.RowsAffected()
-	return affected == 1
+	return affected == 1, nil
 }
 
 func CleanDatabase() error {

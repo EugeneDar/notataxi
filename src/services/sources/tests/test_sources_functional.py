@@ -17,34 +17,42 @@ from toll_roads_pb2 import TollRoadsRequest
 from zone_data_pb2_grpc import ZoneDataServiceStub
 from zone_data_pb2 import ZoneDataRequest
 
+MOCKS_ADDRESS = os.getenv("MOCKS_ADDRESS")
+if MOCKS_ADDRESS is None:
+    raise 'Fill MOCKS_ADDRESS before running the test'
+
+SOURCES_ADDRESS = os.getenv("SOURCES_ADDRESS")
+if SOURCES_ADDRESS is None:
+    raise 'Fill SOURCES_ADDRESS before running the test'
+
 @pytest.fixture(scope="module")
 def grpc_channel_config():
-    with grpc.insecure_channel('51.250.41.223:9090') as channel:
+    with grpc.insecure_channel(f'{MOCKS_ADDRESS}:9090') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_executor_profile():
-    with grpc.insecure_channel('51.250.41.223:9094') as channel:
+    with grpc.insecure_channel(f'{MOCKS_ADDRESS}:9094') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_order_data():
-    with grpc.insecure_channel('51.250.41.223:9091') as channel:
+    with grpc.insecure_channel(f'{MOCKS_ADDRESS}:9091') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_sources():
-    with grpc.insecure_channel('158.160.131.119:9000') as channel:
+    with grpc.insecure_channel(f'{SOURCES_ADDRESS}:9000') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_toll_roads():
-    with grpc.insecure_channel('51.250.41.223:9093') as channel:
+    with grpc.insecure_channel(f'{MOCKS_ADDRESS}:9093') as channel:
         yield channel
 
 @pytest.fixture(scope="module")
 def grpc_channel_zone_data():
-    with grpc.insecure_channel('51.250.41.223:9092') as channel:
+    with grpc.insecure_channel(f'{MOCKS_ADDRESS}:9092') as channel:
         yield channel
 
 @pytest.fixture(scope="module")

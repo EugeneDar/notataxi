@@ -13,6 +13,4 @@ RUN apt-get update && \
 
 RUN go build -o /go/bin/orders src/services/orders/app/main.go
 
-EXPOSE 8089
-
 ENTRYPOINT [ "/go/bin/orders" ]

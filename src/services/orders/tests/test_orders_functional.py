@@ -7,9 +7,8 @@ import uuid
 from datetime import datetime
 import time
 
-ORDERS_SERVICE_HOST = "localhost"
-ORDERS_SERVICE_PORT = os.getenv("ORDERS_SERVICE_PORT", "8080")
-BASE_URL = f"http://{ORDERS_SERVICE_HOST}:{ORDERS_SERVICE_PORT}"
+ORDERS_ADDRESS = os.getenv("ORDERS_ADDRESS", "localhost:8080")
+BASE_URL = f"http://{ORDERS_ADDRESS}"
 
 def print_response_details(response):
     print(f"\nResponse Status Code: {response.status_code}")
@@ -59,13 +58,13 @@ def test_assign_order():
     response = requests.put(f"{BASE_URL}/order/assign", params=params)
     print_response_details(response)
     assert response.status_code == 200
-    assert response.json()["message"] == "success"
+    assert response.json()["message"] == "Successfully created"
 
 def test_assign_order_missing_params():
     response = requests.put(f"{BASE_URL}/order/assign")
     print_response_details(response)
     assert response.status_code == 400
-    assert response.json()["error"] == "Missing parameters, please provide order_id, executor_id and zone_id"
+    assert response.json()["message"] == "Missing parameters, please provide order_id, executor_id and zone_id"
 
 def test_assign_order_duplicate(test_order):
     response = requests.put(f"{BASE_URL}/order/assign", params=test_order)
@@ -109,7 +108,7 @@ def test_cancel_missing_order_id():
     response = requests.post(f"{BASE_URL}/order/cancel")
     print_response_details(response)
     assert response.status_code == 400
-    assert response.json()["error"] == "Missing parameters, please provide order_id"
+    assert response.json()["message"] == "Missing parameters, please provide order_id"
 
 def test_cancel_order_edge_cases():
     order_id = generate_unique_id()
