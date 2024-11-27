@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sources-deployment-v1
+  name: sources-deployment-2
   labels:
     app: sources
-    version: v1
+    version: v2
 spec:
   replicas: 1  # Число реплик приложения
   selector:
     matchLabels:
       app: sources
-      version: v1
+      version: v2
   template:
     metadata:
       labels:
         app: sources
-        version: v1
+        version: v2
     spec:
       containers:
         - name: config-mock
-          image: cr.yandex/crpatchv2fnnbum2cdu7/sources:v1
+          image: cr.yandex/crpatchv2fnnbum2cdu7/sources:v2
           ports:
             - containerPort: 9000

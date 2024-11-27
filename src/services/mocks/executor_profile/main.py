@@ -27,14 +27,14 @@ def random_sublist(list, subset_size, seed):
 
 class ExecutorProfileServiceServicer(executor_profile_pb2_grpc.ExecutorProfileServiceServicer):
     def GetExecutorProfile(self, request, context):
-        if len(request.display_name) == 0:
+        if len(request.executor_id) == 0:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             return executor_profile_pb2.ExecutorProfileResponse()
 
         response = executor_profile_pb2.ExecutorProfileResponse(
-            id=str(hash(request.display_name) % 500000 + 1),
-            tags=random_sublist(['fast', 'good conversation', 'good music', 'clear car'], 2, hash(request.display_name)),
-            rating=float_from_str(request.display_name) + 4,
+            id=str(hash(request.executor_id) % 500000 + 1),
+            tags=random_sublist(['fast', 'good conversation', 'good music', 'clear car'], 2, hash(request.executor_id)),
+            rating=float_from_str(request.executor_id) + 4,
         )
         return response
 

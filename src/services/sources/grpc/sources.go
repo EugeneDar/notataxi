@@ -135,10 +135,10 @@ func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesReque
 
 	useFallback := false
 
-	executorInfo, err := s.GRPCExecutor.GetExecutorProfile(executorContext, &executor_profile.ExecutorProfileRequest{DisplayName: zoneInfo.GetDisplayName()})
+	executorInfo, err := s.GRPCExecutor.GetExecutorProfile(executorContext, &executor_profile.ExecutorProfileRequest{ExecutorId: req.GetExecutorId()})
 	if err != nil {
 		useFallback = true
-		executorInfo, err = s.GRPCExecutorFallback.GetExecutorProfile(ctx, &executor_profile.ExecutorProfileRequest{DisplayName: zoneInfo.GetDisplayName()})
+		executorInfo, err = s.GRPCExecutorFallback.GetExecutorProfile(ctx, &executor_profile.ExecutorProfileRequest{ExecutorId: req.GetExecutorId()})
 		if err != nil {
 			return nil, err
 		}
