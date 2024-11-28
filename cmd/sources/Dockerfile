@@ -4,6 +4,6 @@ WORKDIR /go
 
 COPY . .
 
-RUN go build -o /go/bin/sources src/services/sources/app/main.go
+RUN go build -o /go/bin/sources cmd/sources/main.go
 
 ENTRYPOINT [ "/go/bin/sources" ]

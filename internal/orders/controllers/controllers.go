@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"app/src/services/orders/app/database"
-	"app/src/services/orders/requests"
+	"notataxi/internal/orders/database"
+	"notataxi/internal/orders/requests"
 
 	"fmt"
 	"log"

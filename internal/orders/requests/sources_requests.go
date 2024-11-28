@@ -1,8 +1,9 @@
 package requests
 
 import (
-	"app/src/services/orders/model"
-	"app/src/services/sources/protobufs/sources"
+	"notataxi/internal/orders/model"
+	"notataxi/internal/protobufs/sources"
+
 	"context"
 
 	"github.com/google/uuid"

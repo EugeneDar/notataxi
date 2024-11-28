@@ -1,7 +1,7 @@
 package main
 
 import (
-	"app/src/services/sources/grpc"
+	"notataxi/internal/sources/grpc"
 
 	"log"
 	"net"

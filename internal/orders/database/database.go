@@ -1,15 +1,15 @@
 package database
 
 import (
-	"app/src/services/orders/model"
+	"notataxi/internal/orders/model"
+
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
-
-	"context"
 
 	"github.com/jackc/pgx/v4"
 )

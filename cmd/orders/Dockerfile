@@ -11,6 +11,6 @@ RUN apt-get update && \
          --output-document ~/.postgresql/root.crt && \
     chmod 0655 ~/.postgresql/root.crt
 
-RUN go build -o /go/bin/orders src/services/orders/app/main.go
+RUN go build -o /go/bin/orders cmd/orders/main.go
 
 ENTRYPOINT [ "/go/bin/orders" ]

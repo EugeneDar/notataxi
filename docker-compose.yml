@@ -11,8 +11,8 @@ services:
       POSTGRES_USER: ${ORDERS_DB_USER}
       POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
     volumes:
-      - ./src/services/orders/database/data/:/var/lib/postgresql/data
-      - ./src/services/orders/database/init_migrations:/docker-entrypoint-initdb.d
+      - ./internal/orders/database/data/:/var/lib/postgresql/data
+      - ./internal/orders/database/init_migrations:/docker-entrypoint-initdb.d
     networks:
       - orders-service-network
   
@@ -20,7 +20,7 @@ services:
     container_name: orders_app
     build:
       context: .
-      dockerfile: src/services/orders/Dockerfile
+      dockerfile: cmd/orders/Dockerfile
     depends_on:
       - orders_db
     environment:
@@ -40,7 +40,7 @@ services:
     container_name: sources_app
     build:
       context: .
-      dockerfile: src/services/sources/Dockerfile
+      dockerfile: cmd/sources/Dockerfile
     ports:
       - "9000:9000"
     restart: always

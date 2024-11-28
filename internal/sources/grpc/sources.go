@@ -1,12 +1,12 @@
 package grpcsources
 
 import (
-	"app/src/services/sources/protobufs/config"
-	"app/src/services/sources/protobufs/executor_profile"
-	"app/src/services/sources/protobufs/order_data"
-	"app/src/services/sources/protobufs/sources"
-	"app/src/services/sources/protobufs/toll_roads"
-	"app/src/services/sources/protobufs/zone_data"
+	"notataxi/internal/protobufs/config"
+	"notataxi/internal/protobufs/executor_profile"
+	"notataxi/internal/protobufs/order_data"
+	"notataxi/internal/protobufs/sources"
+	"notataxi/internal/protobufs/toll_roads"
+	"notataxi/internal/protobufs/zone_data"
 
 	"context"
 	"log"
