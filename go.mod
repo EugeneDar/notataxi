@@ -1,4 +1,4 @@
-module app
+module notataxi
 
 go 1.22.7
 
