@@ -6,10 +6,13 @@ import time
 import random
 from datetime import datetime
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../protobufs'))
+sys.path.append('internal/protobufs')
+from internal.protobufs.sources_pb2_grpc import SourcesServiceStub
+from internal.protobufs.sources_pb2 import SourcesRequest
 
-from sources_pb2_grpc import SourcesServiceStub
-from sources_pb2 import SourcesRequest
+SOURCES_ADDRESS = os.getenv("SOURCES_ADDRESS")
+if SOURCES_ADDRESS is None:
+    sys.exit('Fill SOURCES_ADDRESS before running the test')
 
 class GRPCUser(User):
     abstract = True
@@ -20,7 +23,7 @@ class GRPCUser(User):
         self.client = None
         
     def on_start(self):
-        self.channel = grpc.insecure_channel("130.193.46.187:9000")
+        self.channel = grpc.insecure_channel(f"{SOURCES_ADDRESS}:9000")
         self.client = SourcesServiceStub(self.channel)
         self.order_ids = [f"order_{i}" for i in range(1000)]
         self.executor_ids = [f"exec_{i}" for i in range(100)]

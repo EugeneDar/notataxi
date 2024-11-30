@@ -49,3 +49,5 @@ protoc \
     --go_out=internal/protobufs \
     --go-grpc_out=internal/protobufs \
     internal/proto/*.proto
+
+echo Success!

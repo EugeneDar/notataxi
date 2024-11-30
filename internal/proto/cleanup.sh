@@ -10,3 +10,5 @@ rm -rf internal/protobufs
 find . -type f -name '**.pb.go' -delete
 find . -type f -name '**_pb2.py' -delete
 find . -type f -name '**_pb2_grpc.py' -delete
+
+echo Success!

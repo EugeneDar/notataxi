@@ -3,27 +3,28 @@ import os
 import pytest
 import grpc
 from google.protobuf import empty_pb2
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../protobufs'))
-from config_pb2_grpc import ConfigServiceStub
-from config_pb2 import ConfigResponse
-from executor_profile_pb2_grpc import ExecutorProfileServiceStub
-from executor_profile_pb2 import ExecutorProfileRequest
-from order_data_pb2_grpc import OrderDataServiceStub
-from order_data_pb2 import OrderDataRequest
-from sources_pb2_grpc import SourcesServiceStub
-from sources_pb2 import SourcesRequest
-from toll_roads_pb2_grpc import TollRoadsServiceStub
-from toll_roads_pb2 import TollRoadsRequest
-from zone_data_pb2_grpc import ZoneDataServiceStub
-from zone_data_pb2 import ZoneDataRequest
+
+sys.path.append('internal/protobufs')
+from internal.protobufs.config_pb2_grpc import ConfigServiceStub
+from internal.protobufs.config_pb2 import ConfigResponse
+from internal.protobufs.executor_profile_pb2_grpc import ExecutorProfileServiceStub
+from internal.protobufs.executor_profile_pb2 import ExecutorProfileRequest
+from internal.protobufs.order_data_pb2_grpc import OrderDataServiceStub
+from internal.protobufs.order_data_pb2 import OrderDataRequest
+from internal.protobufs.sources_pb2_grpc import SourcesServiceStub
+from internal.protobufs.sources_pb2 import SourcesRequest
+from internal.protobufs.toll_roads_pb2_grpc import TollRoadsServiceStub
+from internal.protobufs.toll_roads_pb2 import TollRoadsRequest
+from internal.protobufs.zone_data_pb2_grpc import ZoneDataServiceStub
+from internal.protobufs.zone_data_pb2 import ZoneDataRequest
 
 MOCKS_ADDRESS = os.getenv("MOCKS_ADDRESS")
 if MOCKS_ADDRESS is None:
-    raise 'Fill MOCKS_ADDRESS before running the test'
+    sys.exit('Fill MOCKS_ADDRESS before running the test')
 
 SOURCES_ADDRESS = os.getenv("SOURCES_ADDRESS")
 if SOURCES_ADDRESS is None:
-    raise 'Fill SOURCES_ADDRESS before running the test'
+    sys.exit('Fill SOURCES_ADDRESS before running the test')
 
 @pytest.fixture(scope="module")
 def grpc_channel_config():
