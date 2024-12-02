@@ -4,58 +4,33 @@ import (
 	"notataxi/internal/orders/model"
 
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"database/sql"
 	"errors"
 	"fmt"
-	"io/ioutil"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/lib/pq"
 )
 
 const (
-	host     = "rc1b-xy6y7apt7j7jdpc7.mdb.yandexcloud.net,rc1d-opy4a78yulgzu7z2.mdb.yandexcloud.net"
-	port     = 6432
-	user     = "user1"
-	password = "NgdXRLUNn67d8tR"
-	dbname   = "db1"
-	ca       = "/go/.postgresql/root.crt"
-	timeZone = "Europe/Moscow"
+	host        = "rc1b-xy6y7apt7j7jdpc7.mdb.yandexcloud.net,rc1d-opy4a78yulgzu7z2.mdb.yandexcloud.net"
+	port        = 6432
+	user        = "user1"
+	password    = "NgdXRLUNn67d8tR"
+	dbname      = "db1"
+	sslrootcert = "/go/.postgresql/root.crt"
+	timeZone    = "Europe/Moscow"
 )
 
-var db *pgx.Conn
+var db *pgxpool.Pool
 
 func EstablishConnection() (err error) {
-	rootCertPool := x509.NewCertPool()
-	pem, err := ioutil.ReadFile(ca)
-	if err != nil {
-		panic(err)
-	}
+	connString := fmt.Sprintf(
+		"host=%s port=%d dbname=%s user=%s password=%s sslmode=require sslrootcert=%s target_session_attrs=read-write",
+		host, port, dbname, user, password, sslrootcert)
 
-	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		panic("Failed to append PEM.")
-	}
-
-	connstring := fmt.Sprintf(
-		"host=%s port=%d dbname=%s user=%s password=%s sslmode=verify-full target_session_attrs=read-write",
-		host, port, dbname, user, password)
-
-	connConfig, err := pgx.ParseConfig(connstring)
-	if err != nil {
-		return fmt.Errorf("unable to parse config: %v", err)
-	}
-
-	connConfig.TLSConfig = &tls.Config{
-		RootCAs:            rootCertPool,
-		InsecureSkipVerify: true,
-	}
-
-	db, err = pgx.ConnectConfig(context.Background(), connConfig)
-	if err != nil {
-		return fmt.Errorf("unable to connect to database: %v", err)
-	}
-	return nil
+	db, err = pgxpool.New(context.Background(), connString)
+	return err
 }
 
 func AddAssignedOrder(assignedOrder *model.AssignedOrder) (bool, error) {
