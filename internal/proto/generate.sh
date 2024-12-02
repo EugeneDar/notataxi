@@ -26,6 +26,11 @@ python3 -m grpc_tools.protoc \
     internal/proto/executor_profile.proto
 python3 -m grpc_tools.protoc \
     -I=internal/proto \
+    --python_out=cmd/mocks/executor_fallback \
+    --grpc_python_out=cmd/mocks/executor_fallback \
+    internal/proto/executor_profile.proto
+python3 -m grpc_tools.protoc \
+    -I=internal/proto \
     --python_out=cmd/mocks/order_data \
     --grpc_python_out=cmd/mocks/order_data \
     internal/proto/order_data.proto
