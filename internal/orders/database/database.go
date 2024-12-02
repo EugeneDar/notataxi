@@ -20,7 +20,7 @@ const (
 	user     = "user1"
 	password = "NgdXRLUNn67d8tR"
 	dbname   = "db1"
-	ca       = "/go/src/services/orders/database/root.crt"
+	ca       = "/go/.postgresql/root.crt"
 	timeZone = "Europe/Moscow"
 )
 

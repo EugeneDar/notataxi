@@ -7,7 +7,7 @@ docker build -t <service-name> .
 docker run -p 9090:9090 <service-name>
 ```
 
-To build and publish to Container Registry execute the following from the directory of the mock:
+To build and publish to the Container Registry execute the following from the directory of the mock:
 
 ```bash
 docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v*

@@ -1,5 +1,11 @@
 # Tests on orders service
 
+Before running the tests set the `ORDERS_ADDRESS` environment variable. Example:
+
+```bash
+export ORDERS_ADDRESS=158.160.140.176
+```
+
 To launch functional tests run from the root directory of the repository:
 
 ```bash
