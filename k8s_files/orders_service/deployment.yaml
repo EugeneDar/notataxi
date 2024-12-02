@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orders-deployment-v4
+  name: orders-deployment-v2d0
   labels:
     app: orders
-    version: v4
+    version: v2.0
 spec:
   replicas: 1  # Число реплик приложения
   selector:
     matchLabels:
       app: orders
-      version: v4
+      version: v2.0
   template:
     metadata:
       labels:
         app: orders
-        version: v4
+        version: v2.0
     spec:
       containers:
         - name: config-mock
-          image: cr.yandex/crpatchv2fnnbum2cdu7/orders:v4
+          image: cr.yandex/crpatchv2fnnbum2cdu7/orders:v2.0
           ports:
             - containerPort: 8080

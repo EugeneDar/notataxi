@@ -1,26 +1,30 @@
-Просто собрать:
-```
-sudo docker build -t config-mock .
-sudo docker run -p 9090:9090 config-mock
+# Stubs of some services external to our tasks
+
+To build and run locally execute the following from the directory of the mock:
+
+```bash
+docker build -t <service-name> .
+docker run -p 9090:9090 <service-name>
 ```
 
-Собрать и опубликовать в Container Registry:
-```
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v*
+To build and publish to the Container Registry execute the following from the directory of the mock:
+
+```bash
+docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v*
 docker push cr.yandex/crpatchv2fnnbum2cdu7/config-mock:v*
 
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v*
+docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v*
 docker push cr.yandex/crpatchv2fnnbum2cdu7/executor-profile-mock:v*
 
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v*
+docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v*
 docker push cr.yandex/crpatchv2fnnbum2cdu7/executor-fallback-mock:v*
 
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v*
+docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v*
 docker push cr.yandex/crpatchv2fnnbum2cdu7/order-data-mock:v*
 
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/toll-roads-mock:v*
+docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/toll-roads-mock:v*
 docker push cr.yandex/crpatchv2fnnbum2cdu7/toll-roads-mock:v*
 
-sudo docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v*
+docker build . --tag cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v*
 docker push cr.yandex/crpatchv2fnnbum2cdu7/zone-mock:v*
 ```

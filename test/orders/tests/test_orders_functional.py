@@ -7,8 +7,8 @@ import uuid
 from datetime import datetime
 import time
 
-ORDERS_ADDRESS = os.getenv("ORDERS_ADDRESS", "localhost:8080")
-BASE_URL = f"http://{ORDERS_ADDRESS}"
+ORDERS_ADDRESS = os.getenv("ORDERS_ADDRESS", "127.0.0.1")
+BASE_URL = f"http://{ORDERS_ADDRESS}:8080"
 
 def print_response_details(response):
     print(f"\nResponse Status Code: {response.status_code}")
