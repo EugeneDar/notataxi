@@ -142,6 +142,10 @@ func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesReque
 		if err != nil {
 			return nil, err
 		}
+
+		temp := s.GRPCExecutorFallback
+		s.GRPCExecutor = s.GRPCExecutorFallback
+		s.GRPCExecutorFallback = temp
 	}
 
 	finalPrice, err := s.PriceCalculate(ctx, orderDataInfo.GetBaseCoinAmount(), tollRoadsInfo.GetBonusAmount(), zoneInfo.GetCoinCoeff())
