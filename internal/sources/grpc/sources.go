@@ -125,9 +125,10 @@ func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesReque
 	if !ok {
 		tollRoadsInfo, err = s.GRPCTollRoads.GetTollRoads(ctx, &toll_roads.TollRoadsRequest{DisplayName: zoneInfo.GetDisplayName()})
 		if err != nil {
-			return nil, err
+			tollRoadsInfo = toll_roads.TollRoadsResponse{BonusAmount: 0}
+		} else {
+			s.TollRoadsCache.Add(zoneInfo.GetDisplayName(), tollRoadsInfo)
 		}
-		s.TollRoadsCache.Add(zoneInfo.GetDisplayName(), tollRoadsInfo)
 	}
 
 	executorContext, cancel := context.WithTimeout(ctx, ExecutorTimeOut)
