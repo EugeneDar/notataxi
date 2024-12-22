@@ -1,8 +1,9 @@
 package config
 
 import (
-	"context"
 	"notataxi/internal/protobufs/config"
+
+	"context"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

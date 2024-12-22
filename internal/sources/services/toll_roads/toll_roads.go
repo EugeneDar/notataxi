@@ -1,9 +1,10 @@
 package toll_roads
 
 import (
+	"notataxi/internal/protobufs/toll_roads"
+
 	"context"
 	"log"
-	"notataxi/internal/protobufs/toll_roads"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

@@ -1,9 +1,10 @@
 package zone
 
 import (
+	"notataxi/internal/protobufs/zone_data"
+
 	"context"
 	"log"
-	"notataxi/internal/protobufs/zone_data"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

@@ -1,9 +1,10 @@
 package order_data
 
 import (
+	"notataxi/internal/protobufs/order_data"
+
 	"context"
 	"log"
-	"notataxi/internal/protobufs/order_data"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
