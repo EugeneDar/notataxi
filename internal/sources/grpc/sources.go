@@ -1,12 +1,16 @@
 package grpcsources
 
 import (
-	"notataxi/internal/protobufs/config"
+	grpc_config "notataxi/internal/protobufs/config"
 	"notataxi/internal/protobufs/executor_profile"
-	"notataxi/internal/protobufs/order_data"
 	"notataxi/internal/protobufs/sources"
-	"notataxi/internal/protobufs/toll_roads"
+	grpc_toll_roads "notataxi/internal/protobufs/toll_roads"
 	"notataxi/internal/protobufs/zone_data"
+	"notataxi/internal/sources/services/config"
+	"notataxi/internal/sources/services/executor"
+	"notataxi/internal/sources/services/order_data"
+	"notataxi/internal/sources/services/toll_roads"
+	"notataxi/internal/sources/services/zone"
 
 	"context"
 	"log"
@@ -14,7 +18,6 @@ import (
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -31,63 +34,56 @@ const (
 type ServiceAPI struct {
 	sources.UnsafeSourcesServiceServer
 
-	GRPCConfig config.ConfigServiceClient
+	Config *config.Source
 
-	GRPCOrderData order_data.OrderDataServiceClient
-	GRPCZone      zone_data.ZoneDataServiceClient
-	GRPCTollRoads toll_roads.TollRoadsServiceClient
+	OrderData *order_data.Source
+	Zone      *zone.Source
+	TollRoads *toll_roads.Source
 
-	GRPCExecutor         executor_profile.ExecutorProfileServiceClient
-	GRPCExecutorFallback executor_profile.ExecutorProfileServiceClient
+	Executor *executor.Source
 
-	ConfigCache    *expirable.LRU[string, *config.ConfigResponse]
-	TollRoadsCache *expirable.LRU[string, *toll_roads.TollRoadsResponse]
+	ConfigCache    *expirable.LRU[string, *grpc_config.ConfigResponse]
+	TollRoadsCache *expirable.LRU[string, *grpc_toll_roads.TollRoadsResponse]
 	ZoneCache      *expirable.LRU[string, *zone_data.ZoneDataResponse]
 }
 
 func Register(gRPC *grpc.Server) error {
-	configCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	configSource, err := config.NewSource()
 	if err != nil {
 		return err
 	}
 
-	orderDataCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	orderDataSource, err := order_data.NewSource()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	zoneCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9092", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	zoneSource, err := zone.NewSource()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tollRoadsCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9093", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tollRoadsSource, err := toll_roads.NewSource()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	executorCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9094", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	executorFallbackCon, err := grpc.NewClient("mocks-service.wholeservicenamespace.svc.cluster.local:9095", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	executorSource, err := executor.NewSource()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	sources.RegisterSourcesServiceServer(gRPC, &ServiceAPI{
-		GRPCConfig: config.NewConfigServiceClient(configCon),
+		Config: configSource,
 
-		GRPCOrderData: order_data.NewOrderDataServiceClient(orderDataCon),
-		GRPCZone:      zone_data.NewZoneDataServiceClient(zoneCon),
-		GRPCTollRoads: toll_roads.NewTollRoadsServiceClient(tollRoadsCon),
+		OrderData: orderDataSource,
+		Zone:      zoneSource,
+		TollRoads: tollRoadsSource,
 
-		GRPCExecutor:         executor_profile.NewExecutorProfileServiceClient(executorCon),
-		GRPCExecutorFallback: executor_profile.NewExecutorProfileServiceClient(executorFallbackCon),
+		Executor: executorSource,
 
-		ConfigCache:    expirable.NewLRU[string, *config.ConfigResponse](ConfigFieldsCount, nil, ConfigCacheTTL),
-		TollRoadsCache: expirable.NewLRU[string, *toll_roads.TollRoadsResponse](TollRoadsFieldsCount, nil, BaseCacheTTL),
+		ConfigCache:    expirable.NewLRU[string, *grpc_config.ConfigResponse](ConfigFieldsCount, nil, ConfigCacheTTL),
+		TollRoadsCache: expirable.NewLRU[string, *grpc_toll_roads.TollRoadsResponse](TollRoadsFieldsCount, nil, BaseCacheTTL),
 		ZoneCache:      expirable.NewLRU[string, *zone_data.ZoneDataResponse](ZoneFieldsCount, nil, BaseCacheTTL),
 	})
 
@@ -97,7 +93,7 @@ func Register(gRPC *grpc.Server) error {
 func (s *ServiceAPI) PriceCalculate(ctx context.Context, baseCoinAmount, bonusAmount int32, coinCoeff float32) (int32, error) {
 	configInfo, ok := s.ConfigCache.Get("config")
 	if !ok {
-		configInfo, err := s.GRPCConfig.GetConfig(ctx, nil)
+		configInfo, err := s.Config.CallGetConfig(ctx)
 		if err != nil {
 			return 0, err
 		}
@@ -107,14 +103,28 @@ func (s *ServiceAPI) PriceCalculate(ctx context.Context, baseCoinAmount, bonusAm
 }
 
 func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesRequest) (*sources.SourcesResponse, error) {
-	orderDataInfo, err := s.GRPCOrderData.GetOrderData(ctx, &order_data.OrderDataRequest{OrderId: req.GetOrderId()})
+	executorErrCh := make(chan error)
+	executorInfoCh := make(chan *executor_profile.ExecutorProfileResponse)
+	useFallbackCh := make(chan bool)
+
+	executorContext, cancel := context.WithTimeout(ctx, ExecutorTimeOut)
+	defer cancel()
+
+	go func() {
+		res, err, fallback := s.Executor.GetExecutorProfileWithFallback(executorContext, req.GetExecutorId())
+		executorInfoCh <- res
+		executorErrCh <- err
+		useFallbackCh <- fallback
+	}()
+
+	orderDataInfo, err := s.OrderData.GetOrderData(ctx, req.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
 
 	zoneInfo, ok := s.ZoneCache.Get(orderDataInfo.GetZoneId())
 	if !ok {
-		zoneInfo, err = s.GRPCZone.GetZoneData(ctx, &zone_data.ZoneDataRequest{ZoneId: orderDataInfo.GetZoneId()})
+		zoneInfo, err = s.Zone.GetZoneData(ctx, orderDataInfo.GetZoneId())
 		if err != nil {
 			return nil, err
 		}
@@ -123,35 +133,23 @@ func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesReque
 
 	tollRoadsInfo, ok := s.TollRoadsCache.Get(zoneInfo.GetDisplayName())
 	if !ok {
-		tollRoadsInfo, err = s.GRPCTollRoads.GetTollRoads(ctx, &toll_roads.TollRoadsRequest{DisplayName: zoneInfo.GetDisplayName()})
+		tollRoadsInfo, err = s.TollRoads.GetTollRoads(ctx, zoneInfo.GetDisplayName())
 		if err != nil {
 			return nil, err
 		}
 		s.TollRoadsCache.Add(zoneInfo.GetDisplayName(), tollRoadsInfo)
 	}
 
-	executorContext, cancel := context.WithTimeout(ctx, ExecutorTimeOut)
-	defer cancel()
-
-	useFallback := false
-
-	executorInfo, err := s.GRPCExecutor.GetExecutorProfile(executorContext, &executor_profile.ExecutorProfileRequest{ExecutorId: req.GetExecutorId()})
-	if err != nil {
-		useFallback = true
-		executorInfo, err = s.GRPCExecutorFallback.GetExecutorProfile(ctx, &executor_profile.ExecutorProfileRequest{ExecutorId: req.GetExecutorId()})
-		if err != nil {
-			return nil, err
-		}
-
-		temp := s.GRPCExecutorFallback
-		s.GRPCExecutor = s.GRPCExecutorFallback
-		s.GRPCExecutorFallback = temp
-	}
-
 	finalPrice, err := s.PriceCalculate(ctx, orderDataInfo.GetBaseCoinAmount(), tollRoadsInfo.GetBonusAmount(), zoneInfo.GetCoinCoeff())
 	if err != nil {
 		return nil, err
 	}
+
+	if executorErr := <-executorErrCh; executorErr != nil {
+		return nil, executorErr
+	}
+	executorInfo := <-executorInfoCh
+	useFallback := <-useFallbackCh
 
 	resp := sources.SourcesResponse{
 		OrderId:         req.GetOrderId(),
