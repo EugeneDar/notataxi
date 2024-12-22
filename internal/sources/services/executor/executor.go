@@ -47,3 +47,19 @@ func (s *Source) GetExecutorProfileWithFallback(ctx context.Context, executorId 
 	}
 	return executorInfo, nil, false
 }
+
+func (s *Source) AsyncGetExecutorProfileWithFallback(ctx context.Context, executorId string) (chan *executor_profile.ExecutorProfileResponse, chan error, chan bool) {
+	executorInfoCh := make(chan *executor_profile.ExecutorProfileResponse)
+	executorErrCh := make(chan error)
+	useFallbackCh := make(chan bool)
+
+	go func() {
+		executorInfo, err, useFallback := s.GetExecutorProfileWithFallback(ctx, executorId)
+
+		executorInfoCh <- executorInfo
+		executorErrCh <- err
+		useFallbackCh <- useFallback
+	}()
+
+	return executorInfoCh, executorErrCh, useFallbackCh
+}

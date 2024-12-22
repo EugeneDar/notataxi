@@ -2,7 +2,6 @@ package grpcsources
 
 import (
 	grpc_config "notataxi/internal/protobufs/config"
-	"notataxi/internal/protobufs/executor_profile"
 	"notataxi/internal/protobufs/sources"
 	grpc_toll_roads "notataxi/internal/protobufs/toll_roads"
 	"notataxi/internal/protobufs/zone_data"
@@ -103,19 +102,10 @@ func (s *ServiceAPI) PriceCalculate(ctx context.Context, baseCoinAmount, bonusAm
 }
 
 func (s *ServiceAPI) GetOrderInfo(ctx context.Context, req *sources.SourcesRequest) (*sources.SourcesResponse, error) {
-	executorErrCh := make(chan error)
-	executorInfoCh := make(chan *executor_profile.ExecutorProfileResponse)
-	useFallbackCh := make(chan bool)
-
 	executorContext, cancel := context.WithTimeout(ctx, ExecutorTimeOut)
 	defer cancel()
 
-	go func() {
-		res, err, fallback := s.Executor.GetExecutorProfileWithFallback(executorContext, req.GetExecutorId())
-		executorInfoCh <- res
-		executorErrCh <- err
-		useFallbackCh <- fallback
-	}()
+	executorInfoCh, executorErrCh, useFallbackCh := s.Executor.AsyncGetExecutorProfileWithFallback(executorContext, req.GetExecutorId())
 
 	orderDataInfo, err := s.OrderData.GetOrderData(ctx, req.GetOrderId())
 	if err != nil {
